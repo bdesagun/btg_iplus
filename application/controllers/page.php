@@ -5,18 +5,21 @@ class Page extends CI_Controller {
 	function __construct() {
 		parent::__construct();
 		$this->load->model("data");
-		// if(empty($_SESSION["username"])) {
-		// 	redirect('login');
-		// }
+		if(empty($_SESSION["username"])) {
+			redirect('login');
+		}
 	}
 	function index() {
 		redirect("page/home");
 	}
 	function home() {
-		$_SESSION["systemname"] = "System Name";
 		$_SESSION["activepage"] = "HOME";
-		$_SESSION["theme"] = "theme-light-green";
 		$this->load->view("home");
+	}
+	function filezone()
+	{
+		$_SESSION["activepage"] = "FILEZONE";
+		$this->load->view("filezone");
 	}
 	function get_session(){
 		$post = $this->security->xss_clean($this->input->post());
@@ -25,5 +28,9 @@ class Page extends CI_Controller {
 	}
 	function session_data(){
 		echo json_encode($_SESSION);
+	}
+	function force_logout() {
+		session_destroy();
+		redirect("login");
 	}
 }
