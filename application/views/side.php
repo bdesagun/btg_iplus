@@ -4,7 +4,7 @@
         <!-- Brand -->
         <div class="sidenav-header d-flex align-items-center">
             <a class="navbar-brand" href="home">
-                <img src="../../assets/img/brand/btg.png" class="navbar-brand-img" alt="...">
+                <img src="<?php echo base_url(); ?>assets/img/brand/btg.png" class="navbar-brand-img" alt="...">
             </a>
             <div class="ml-auto">
                 <!-- Sidenav toggler -->
