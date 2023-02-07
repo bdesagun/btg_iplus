@@ -2,17 +2,20 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Page extends CI_Controller {
-	function __construct() {
+	function __construct()
+	{
 		parent::__construct();
 		$this->load->model("data");
 		if(empty($_SESSION["username"])) {
 			redirect('login');
 		}
 	}
-	function index() {
+	function index()
+	{
 		redirect("page/home");
 	}
-	function home() {
+	function home()
+	{
 		$_SESSION["activepage"] = "HOME";
 		$this->load->view("home");
 	}
@@ -21,15 +24,24 @@ class Page extends CI_Controller {
 		$_SESSION["activepage"] = "FILEZONE";
 		$this->load->view("filezone");
 	}
-	function get_session(){
+	function select_filezone()
+	{
+		// $post = $this->security->xss_clean($this->input->post());
+		$data["filezone"] = $this->data->select_filezone();
+		$this->load->view("filezone_table",$data);
+	}
+	function get_session()
+	{
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->get_session($post["session_id"]);
 		echo json_encode($data);
 	}
-	function session_data(){
+	function session_data()
+	{
 		echo json_encode($_SESSION);
 	}
-	function force_logout() {
+	function force_logout()
+	{
 		session_destroy();
 		redirect("login");
 	}

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
     <meta name="author" content="Creative Tim">
-    <title>Argon Dashboard PRO - Premium Bootstrap 4 Admin Template</title>
+    <title><?php echo $_SESSION["systemname"]; ?></title>
     <?php require "css.php"; ?>
 </head>
 
@@ -33,7 +33,7 @@
         <div class="container-fluid mt--6">
             <div class="row justify-content-center">
                 <div class="col-lg-8 card-wrapper">
-                    <div class="card" style="margin: 0 auto; float: none; margin-bottom: 10px;">
+                    <div class="card">
                         <div class="card-body">
                             <h3 class="card-title mb-4">Change how you view indirect tax with i+.</h3>
                             <p class="card-text mb-2">This is the place to access all indirect tax data lodged to the
