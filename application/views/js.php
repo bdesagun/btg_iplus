@@ -18,6 +18,14 @@
 <script src="<?php echo base_url(); ?>assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/select2/dist/js/select2.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/nouislider/distribute/nouislider.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/quill/dist/quill.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/dropzone/dist/min/dropzone.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/bootstrap-notify/bootstrap-notify.min.js"></script>
 <!-- Argon JS -->
 <script src="<?php echo base_url(); ?>assets/js/argon.js?v=1.1.0"></script>
 <!-- Demo JS - remove this in your project -->
