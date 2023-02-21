@@ -46,7 +46,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label class="form-control-label" id="fileType">File Type</label>
+                                    <label class="form-control-label">File Type</label>
                                     <select class="form-control" id="selectType"></select>
                                 </div>
                             </div>
@@ -54,7 +54,15 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label class="form-control-label" id="fileMonth">Month</label>
+                                    <label class="form-control-label">Entity</label>
+                                    <select class="form-control" id="selectEntity"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Month</label>
                                     <select class="form-control" id="selectMonth2"></select>
                                 </div>
                             </div>
@@ -62,7 +70,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label class="form-control-label" id="fileYear">Year</label>
+                                    <label class="form-control-label">Year</label>
                                     <select class="form-control" id="selectYear2"></select>
                                 </div>
                             </div>
@@ -79,7 +87,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="filezoneLabel">Upload File</h5>
+                        <h5 class="modal-title" id="filezoneLabel">Choose File</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -116,6 +124,111 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalHistory" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filezoneLabel">File History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <form id="form_upload" enctype="multipart/form-data">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div id="div_history_file"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Ok</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+            <div class="modal fade" id="modalApprove" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">Approval</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h4>Are you sure you want to approve this file?</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" onclick="approveFile()">Approve</button>
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalDeny" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">Return File</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h4>Are you sure you want to return this file?</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <label class="form-control-label">Reason:</label>
+                                                <textarea class="form-control" id="fileReason" rows="4"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" onclick="denyFile()">Return</button>
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
         <!-- Header -->
         <div class="header pb-6">
             <div class="container-fluid">
@@ -135,14 +248,32 @@
                     <div class="card">
                         <!-- Card header -->
                         <div class="card-header">
-                            <div class="row">
-                                <div class="col-8">
-                                    <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilezone" onclick="newFile()">Upload</button></h3>
-                                </div>
-                                <div class="col-2">
+                            <div class="form-group row">
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2">
+                                        <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilezone" onclick="newFile()">Upload</button></h3>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                                    <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="selectClient" onchange="loadFiles(), GetEntity2()"></select>
+                                    </div>
+                                    <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Entity:</label>
+                                    <div class="col-md-2">
+                                        <select class="form-control" id="selectEntity2" onchange="loadFiles()"><option value='ALL'>ALL</option></select>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "staff" && $_SESSION["position"] != "admin"){ ?>
+                                    <div class="col-md-2"></div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "client" && $_SESSION["position"] != "admin"){ ?>
+                                    <div class="col-md-6"></div>
+                                <?php } ?>
+                                <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadFiles()"></select>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-md-2">
                                     <select class="form-control" id="selectYear" onchange="loadFiles()"></select>
                                 </div>
                             </div>
@@ -161,13 +292,16 @@
     GetYear();
     GetMonth2();
     GetYear2();
+    GetClient();
     GetFileType();
     loadFiles();
     function loadFiles(){
-        $("#div_filezone_table").html("Loading...");
+        $("#div_filezone_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         params = {
             filemonth   : $("#selectMonth").val(),
-            fileyear    : $("#selectYear").val()
+            fileyear    : $("#selectYear").val(),
+            client      : $("#selectClient").val(),
+            entity      : $("#selectEntity2").val(),
         };
         $.post("select_filezone", params).done(function(data) {
             $("#div_filezone_table").html(data);
@@ -223,6 +357,46 @@
             $("#selectType").prop('disabled', false);
         });
     }
+    function GetEntity(){
+        $("#selectEntity").prop('disabled', true);
+        $('#selectEntity')
+            .empty()
+            .append('<option value="a">LOADING...</option>');
+        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+            $("#selectEntity").html(data);
+            $("#selectEntity").prop('disabled', false);
+        });
+    }
+    function GetEntity2(){
+        if($('#selectClient').val() == 'ALL' || $('#selectClient').val() == 'LOADING...'){
+            $("#selectEntity2").val('ALL');
+            $("#selectEntity2").prop('disabled', true);
+        }
+        else{
+            $("#selectEntity2").prop('disabled', true);
+            $('#selectEntity2')
+                .empty()
+                .append('<option value="a">LOADING...</option>');
+            $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+                console.log(data);
+                $("#selectEntity2").html(data);
+                $("#selectEntity2").prop('disabled', false);
+            });
+        }
+    }
+    function GetClient(){
+        $("#selectEntity2").val('ALL');
+        $("#selectEntity2").prop('disabled', true);
+        $("#selectClient").prop('disabled', true);
+        $('#selectClient')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_client").done(function(data) {
+            $("#selectClient").html(data);
+            $("#selectClient").prop('disabled', false);
+        });
+        GetEntity();
+    }
     function newFile(){
         clearFile();
         GetMonth2();
@@ -242,6 +416,36 @@
             $("#selectType").val(filezone.filetype);
             $("#selectMonth2").val(filezone.month);
             $("#selectYear2").val(filezone.year);
+            $("#selectEntity").val(filezone.fileentity);
+        });
+    }
+    function deleteFile(id){
+        let text = "Are you sure you want to delete this file? File cannot be recovered.";
+        if (confirm(text) == true) {
+            params = {
+                fileid : id
+            };
+            $.post("delete_file",params).done(function(data) {
+                swal("Deleted!", "File successfully deleted!");
+                loadFiles();
+            });
+        }
+    }
+    function historyFile(id){
+        $("#div_history_file").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            fileid   : id
+        };
+        $.post("select_filehistory", params).done(function(data) {
+            $("#div_history_file").html(data);
+        });
+    }
+    function viewFile(id){
+        params = {
+            fileid   : id
+        };
+        $.post("view_filehistory", params).done(function(data) {
+            loadFiles();
         });
     }
     function clearFile(){
@@ -262,13 +466,14 @@
             fileType    : $("#selectType").val(),
             fileMonth   : $("#selectMonth2").val(),
             fileYear    : $("#selectYear2").val(),
+            fileEntity  : $("#selectEntity").val(),
         };
         if(saveStatus == 'Upload File'){
             $.post("insert_file",params).done(function(data) {
                 swal("Saved!", "File successfully submitted!", "success");
                 $('#modalFilezone').modal('toggle');
                 if ($("#file_to_upload").val() != ""){
-                    saveToFolder();
+                    saveToFolder($("#selectEntity").val());
                 }
                 loadFiles();
             });
@@ -277,16 +482,37 @@
                 swal("Saved!", "File successfully updated!", "success");
                 $('#modalFilezone').modal('toggle');
                 if ($("#file_to_upload").val() != ""){
-                    saveToFolder();
+                    saveToFolder($("#selectEntity").val());
                 }
                 loadFiles();
             });
         }
     }
-    function saveToFolder(){
+    function getFileID(id){
+        $("#fileReason").val("");
+        file_id = id;
+    }
+    function approveFile(){
+        params = {
+            fileid   : file_id
+        };
+        $.post("approve_file", params).done(function(data) {
+            loadFiles();
+        });
+    }
+    function denyFile(){
+        params = {
+            fileid   : file_id,
+            filereason  : $("#fileReason").val()
+        };
+        $.post("deny_file", params).done(function(data) {
+            loadFiles();
+        });
+    }
+    function saveToFolder(entity){
         var formEl = document.forms.form_upload;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file',
+            url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + entity,
             type:"post",
             data:new FormData(formEl),
             processData:false,

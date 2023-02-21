@@ -43,6 +43,10 @@
                             <i class="ni ni-single-02"></i>
                             <span>My profile</span>
                         </a>
+                        <a href="accounts" class="dropdown-item">
+                            <i class="ni ni-single-02"></i>
+                            <span>Accounts</span>
+                        </a>
                         <div class="dropdown-divider"></div>
                         <a href="force_logout" class="dropdown-item">
                             <i class="ni ni-user-run"></i>

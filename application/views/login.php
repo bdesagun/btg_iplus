@@ -10,8 +10,8 @@
 =========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- -->
- <!DOCTYPE html>
+-->
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -44,6 +44,12 @@
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border-0 mb-0">
             <div class="card-body px-lg-5 py-lg-5">
+              <div class="alert alert-danger alert-dismissible fade show" role="alert" id="loginAlert"  hidden>
+                <span class="alert-text">Username or Password is incorrect.</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
               <div class="text-center text-muted mb-4">
                 <small>Sign in with credentials</small>
               </div>
@@ -91,7 +97,7 @@
         };
         $.post("verify_login",params).done(function(data) {
             if(data == 'denied'){
-                $.notify("Username and password did not match. Please try again", "error");
+              alert("Username or Password is incorrect.");
             }
             else if (data == 'verified'){
                 window.location.href = 'homepage';

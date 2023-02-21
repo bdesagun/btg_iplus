@@ -7,11 +7,11 @@ class Login extends CI_Controller {
 		$this->load->model("data");
 	}
 	function index() {
-		$_SESSION["systemname"] = "BTG Intelligence Plus";
-		$_SESSION["theme"] = "theme-light-green";
 		redirect("login/login_screen");
 	}
 	function login_screen() {
+		$_SESSION["systemname"] = "BTG Intelligence Plus";
+		$_SESSION["theme"] = "theme-light-green";
 		$this->load->view("login");
 	}
 	function session(){
@@ -22,8 +22,8 @@ class Login extends CI_Controller {
 		$data = $this->data->select_account($post["username"],$post["password"]);
 		if (!empty($data)) {
 			$_SESSION["accountname"] = $data["accountname"];
-			$_SESSION["username"] = $data["username"]; 
-			$_SESSION["password"] = $data["password"];
+			$_SESSION["username"] = $data["username"];
+			$_SESSION["position"] = $data["position"];
 			echo 'verified';
 		}
 		else {
@@ -38,6 +38,6 @@ class Login extends CI_Controller {
 		redirect("login");
 	}
 	// function encrypt_pass(){
-	// 	echo md5("admin");
+	// 	echo md5("client2");
 	// }
 }
