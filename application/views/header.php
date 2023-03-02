@@ -39,14 +39,20 @@
                         <div class="dropdown-header noti-title">
                             <h6 class="text-overflow m-0">Welcome!</h6>
                         </div>
-                        <a href="#!" class="dropdown-item">
+                        <a href="profile" class="dropdown-item">
                             <i class="ni ni-single-02"></i>
                             <span>My profile</span>
                         </a>
-                        <a href="accounts" class="dropdown-item">
-                            <i class="ni ni-single-02"></i>
-                            <span>Accounts</span>
-                        </a>
+                        <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                            <a href="accounts" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Accounts</span>
+                            </a>
+                            <a href="clients" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Clients</span>
+                            </a>
+                        <?php } ?>
                         <div class="dropdown-divider"></div>
                         <a href="force_logout" class="dropdown-item">
                             <i class="ni ni-user-run"></i>

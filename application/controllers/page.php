@@ -7,6 +7,8 @@ class Page extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model("data");
+		$this->load->config('email');
+        $this->load->library('email');
 		if (empty($_SESSION["username"])) {
 			redirect('login');
 		}
@@ -25,16 +27,69 @@ class Page extends CI_Controller
 		$_SESSION["activepage"] = "FILEZONE";
 		$this->load->view("filezone");
 	}
+	function workflow()
+	{
+		$_SESSION["activepage"] = "WORKFLOW";
+		$this->load->view("workflow");
+	}
+	function dashboards()
+	{
+		$_SESSION["activepage"] = "DASHBOARDS";
+		$this->load->view("dashboards");
+	}
 	function accounts()
 	{
+		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+			$_SESSION["activepage"] = "N/A";
+			$this->load->view("accounts");
+		}else{
+			redirect("page/home");
+		}
+	}
+	function clients()
+	{
+		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+			$_SESSION["activepage"] = "N/A";
+			$this->load->view("clients");
+		}else{
+			redirect("page/home");
+		}
+	}
+	function profile()
+	{
 		$_SESSION["activepage"] = "N/A";
-		$this->load->view("accounts");
+		$this->load->view("profile");
+	}
+	function change_password() {
+		$post = $this->security->xss_clean($this->input->post());
+		$data = $this->data->select_account($_SESSION["username"],$post["currentpassword"]);
+		if (!empty($data)) {
+			$this->data->change_password($_SESSION["username"],$post["newpassword"]);
+			echo 'accepted';
+		}
+		else {
+			echo 'denied';
+		}
 	}
 	function select_account_list()
 	{
+		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+			$data["acclist"] = $this->data->select_account_list();
+			$this->load->view("accounts_table", $data);
+		}else{
+			redirect("page/home");
+		}
 		//$post = $this->security->xss_clean($this->input->post());
-		$data["acclist"] = $this->data->select_account_list();
-		$this->load->view("accounts_table", $data);
+	}
+	function select_client_list()
+	{
+		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+			$data["clients"] = $this->data->select_client_list();
+			$this->load->view("clients_table", $data);
+		}else{
+			redirect("page/home");
+		}
+		//$post = $this->security->xss_clean($this->input->post());
 	}
 	function select_filezone()
 	{
@@ -112,7 +167,17 @@ class Page extends CI_Controller
 		$res = $this->data->select_client();
 		$option .= "<option value='ALL'>ALL</option>";
 		foreach ($res as $v) {
-			$option .= "<option value='" . $v["accountname"] . "'>" . $v["accountname"] . "</option>";
+			$option .= "<option value='" . $v["clientname"] . "'>" . $v["clientname"] . "</option>";
+		}
+		echo $option;
+	}
+	function select_clientname()
+	{
+		$option = "";
+		$res = $this->data->select_client();
+		$option .= "<option value=''>Select Client</option>";
+		foreach ($res as $v) {
+			$option .= "<option value='" . $v["subcategory"] . "'>" . $v["subcategory"] . "</option>";
 		}
 		echo $option;
 	}
@@ -123,7 +188,7 @@ class Page extends CI_Controller
 		if (isset($post["id"])) {
 			$client = $post["id"];
 		} else {
-			$client = $_SESSION["accountname"];
+			$client = $_SESSION["clientname"];
 		}
 		$option = "";
 		$res = $this->data->select_entity($client);
@@ -134,6 +199,75 @@ class Page extends CI_Controller
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
 		}
 		echo $option;
+	}
+	function insert_account(){
+		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+		$emailcode = substr(str_shuffle($permitted_chars), 0, 30);
+		$post = $this->security->xss_clean($this->input->post());
+        $to = $post["email"];
+        $subject = 'BTGI Plus Email Verification';
+		$data["emailcode"] = $emailcode;
+        $message = $this->load->view('mail_template/email_verification',$data,true);
+        $from = $this->config->item('smtp_user');
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_account(
+			$post["username"],
+			$post["accountname"],
+			$post["email"],
+			$post["position"],
+			$post["clientname"],
+			$data["emailcode"]
+		);
+        $this->email->set_newline("\r\n");
+        $this->email->from($from);
+        $this->email->to($to);
+        $this->email->subject($subject);
+        $this->email->message($message);
+
+        if ($this->email->send()) {
+            echo 'Your Email has successfully been sent.';
+        } else {
+            show_error($this->email->print_debugger());
+        }
+	}
+	function update_account()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_account(
+			$post["accountname"],
+			$post["email"],
+			$post["position"],
+			$post["username"],
+			$post["clientname"]
+		);
+	}
+	function insert_client()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_client(
+			$post["clientname"],
+			$post["address"],
+			$post["industry"]
+		);
+	}
+	function update_client()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_client(
+			$post["clientname"],
+			$post["address"],
+			$post["industry"],
+			$post["clientid"]
+		);
+	}
+	function update_profile()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_profile(
+			$post["address"],
+			$post["mobilenumber"],
+			$post["telephonenumber"]
+		);
 	}
 	function insert_file()
 	{
@@ -146,6 +280,22 @@ class Page extends CI_Controller
 			$post["fileEntity"]
 		);
 		$this->data->insert_history("Submitted", "", "");
+	}
+	function update_file()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_file(
+			$post["fileid"],
+			$post["fileName"],
+			$post["fileType"],
+			$post["fileMonth"],
+			$post["fileYear"],
+			$post["fileEntity"]
+		);
+		$data = $this->data->deny_filehistory($post["fileid"]);
+		if (!empty($data)) {
+			$this->data->insert_history("Updated", $post["fileid"], "");
+		}
 	}
 	function view_filehistory()
 	{
@@ -171,21 +321,40 @@ class Page extends CI_Controller
 			$this->data->insert_history("Returned", $post["fileid"], $post["filereason"]);
 		}
 	}
-	function update_file()
+	function active_account()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$this->data->update_file(
-			$post["fileid"],
-			$post["fileName"],
-			$post["fileType"],
-			$post["fileMonth"],
-			$post["fileYear"],
-			$post["fileEntity"]
-		);
-		$data = $this->data->deny_filehistory($post["fileid"]);
-		if (!empty($data)) {
-			$this->data->insert_history("Updated", $post["fileid"], "");
-		}
+		$this->data->active_account($post["username"], $post["active"]);
+	}
+	function active_client()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->active_client($post["clientid"], $post["active"]);
+	}
+	function reset_account()
+	{
+		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
+		$post = $this->security->xss_clean($this->input->post());
+        $to = $post["email"];
+        $subject = 'BTGI Plus Account Reset Password';
+		$data["username"] = $post["username"];
+		$data["password"] = $genpassword;
+        $message = $this->load->view('mail_template/reset_password_template',$data,true);
+        $from = $this->config->item('smtp_user');
+		$this->data->reset_account($post["username"], $genpassword);
+
+        $this->email->set_newline("\r\n");
+        $this->email->from($from);
+        $this->email->to($to);
+        $this->email->subject($subject);
+        $this->email->message($message);
+
+        if ($this->email->send()) {
+            echo 'Your Email has successfully been sent.';
+        } else {
+            show_error($this->email->print_debugger());
+        }
 	}
 	function upload_file()
 	{
@@ -207,6 +376,23 @@ class Page extends CI_Controller
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->get_filezone($post["fileid"]);
+		echo json_encode($data);
+	}
+	function get_account()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data = $this->data->get_account($post["username"]);
+		echo json_encode($data);
+	}
+	function get_profile()
+	{
+		$data = $this->data->get_account($_SESSION["username"]);
+		echo json_encode($data);
+	}
+	function get_client()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data = $this->data->get_client($post["clientid"]);
 		echo json_encode($data);
 	}
 	function delete_file(){

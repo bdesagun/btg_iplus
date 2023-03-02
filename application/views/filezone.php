@@ -430,6 +430,26 @@
                 loadFiles();
             });
         }
+        // params = {
+        //     fileid : id
+        // };
+        // swal({
+        //     title: "Are you sure you want to delete this file?",
+        //     text: "You will not be able to recover this file!",
+        //     type: "warning",
+        //     showCancelButton: true,
+        //     confirmButtonColor: "#DD6B55",
+        //     confirmButtonText: "Yes",
+        //     cancelButtonText: "No"
+        // }, function (isConfirm) {
+        //     alert("dumaan");
+        //     if (isConfirm) {
+        //         $.post("delete_file",params).done(function(data) {
+        //             swal("Deleted!", "Your file has been deleted.", "success");
+        //             loadFiles();
+        //         });
+        //     }
+        // });
     }
     function historyFile(id){
         $("#div_history_file").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");

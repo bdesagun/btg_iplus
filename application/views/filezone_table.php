@@ -21,7 +21,7 @@
                     <td><i class="ni ni-tag"></i><?php echo " ".$row['filestatus']; ?>   </td>
                     <td><?php echo $row['filedate']; ?></td>
                     <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
-                        <td><?php echo $row['accountname']; ?></td>
+                        <td><?php echo $row['clientname']; ?></td>
                     <?php } ?>
                     <td>
                         <?php if(($_SESSION["position"] == "client" || $_SESSION["position"] == "admin") && $row['filestatus'] == "Submitted"){ ?>

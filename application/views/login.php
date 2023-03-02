@@ -53,7 +53,8 @@
               <div class="text-center text-muted mb-4">
                 <small>Sign in with credentials</small>
               </div>
-              <form role="form">
+              <form id="form_login">
+                <div class="form-group mb-3" id="validation_login"></div>
                 <div class="form-group mb-3">
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
@@ -77,7 +78,7 @@
                   </label>
                 </div>
                 <div class="text-center">
-                  <button type="submit" class="btn btn-primary my-4" onclick="form_login()">Sign in</button>
+                  <button type="submit" class="btn btn-primary my-4">Sign in</button>
                 </div>
               </form>
             </div>
@@ -89,7 +90,8 @@
   <?php require "js.php"; ?>
 </body>
 <script>
-    function form_login(){
+    $("#form_login").submit(function(e){
+        e.preventDefault();
         var params;
         params = {
             username : $("#username").val(),
@@ -97,12 +99,19 @@
         };
         $.post("verify_login",params).done(function(data) {
             if(data == 'denied'){
-              alert("Username or Password is incorrect.");
+              $('#validation_login')
+                .empty()
+                .append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Username or Password is incorrect!</span></div>");
             }
-            else if (data == 'verified'){
+            else if(data == 'verified'){
                 window.location.href = 'homepage';
             }
+            else if(data == 'inactive'){
+              $('#validation_login')
+                .empty()
+                .append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Your account is inactive!</span></div>");
+            }
         });
-    }
+    });
 </script>
 </html>

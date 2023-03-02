@@ -21,10 +21,15 @@ class Login extends CI_Controller {
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->select_account($post["username"],$post["password"]);
 		if (!empty($data)) {
-			$_SESSION["accountname"] = $data["accountname"];
-			$_SESSION["username"] = $data["username"];
-			$_SESSION["position"] = $data["position"];
-			echo 'verified';
+			if($data["active"] == '1'){
+				$_SESSION["accountname"] = $data["accountname"];
+				$_SESSION["username"] = $data["username"];
+				$_SESSION["position"] = $data["position"];
+				$_SESSION["clientname"] = $data["clientname"];
+				echo 'verified';
+			}else{
+				echo 'inactive';
+			}
 		}
 		else {
 			echo 'denied';

@@ -29,13 +29,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="dashboards"  style="<?php echo ($_SESSION["activepage"] == "DASHBOARDS") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
                             <i class="ni ni-chart-pie-35 text-black"></i>
                             <span class="nav-link-text">Dashboards</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="workflow"  style="<?php echo ($_SESSION["activepage"] == "WORKFLOW") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
                             <i class="ni ni-single-copy-04 text-black"></i>
                             <span class="nav-link-text">Workflow</span>
                         </a>

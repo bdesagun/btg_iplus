@@ -10,11 +10,62 @@ class Data extends CI_Model {
 	public function select_account($username, $password)
 	{
 		$pmd5 = md5($password);
-		return $this->db->query("SELECT * FROM useraccount WHERE username = ? AND password = ? AND active = 1", array($username, $pmd5))->row_array();
+		return $this->db->query("SELECT * FROM useraccount WHERE username = ? AND password = ?", array($username, $pmd5))->row_array();
+	}
+	public function verify_account($emailcode)
+	{
+		return $this->db->query("SELECT * FROM useraccount WHERE emailcode = ? AND active = 2", array($emailcode))->row_array();
+	}
+	public function verify_email($username)
+	{
+		$q = "UPDATE useraccount SET active=3 WHERE username=?";
+		$params = array($username);
+		$this->db->query($q, $params);
+	}
+	public function change_password($username, $password)
+	{
+		$pmd5 = md5($password);
+		$q = "UPDATE useraccount SET password=? WHERE username=?";
+		$params = array($pmd5, $username);
+		$this->db->query($q, $params);
 	}
 	public function select_account_list()
 	{
-		$q = "SELECT username AS 'Username', accountname AS 'Account Name', email AS 'Email', position AS 'Position' FROM useraccount";
+		// 1 - Active
+		// 0 - Inactive
+		// 2 - New
+		// 3 - Email Verified
+		$q = "SELECT
+				username,
+				accountname AS 'Account Name',
+				clientname AS 'Client Name',
+				email AS 'Email',
+				position AS 'Position',
+				CASE
+					WHEN active = 1 THEN 'Active'
+					WHEN active = 0 THEN 'Inactive'
+					WHEN active = 3 THEN 'Email Verified'
+					ELSE 'New'
+				END AS 'Status',
+				active
+			FROM
+				useraccount";
+
+		return $this->db->query($q)->result_array();
+	}
+	public function select_client_list()
+	{
+		// 1 - Active
+		// 0 - Inactive
+		$q = "SELECT
+				*,
+				CASE
+					WHEN active = 1 THEN 'Active'
+					WHEN active = 0 THEN 'Inactive'
+				END AS 'status',
+				active
+			FROM
+				clients";
 
 		return $this->db->query($q)->result_array();
 	}
@@ -39,7 +90,7 @@ class Data extends CI_Model {
 			if ($entity == "ALL"){
 				$entity = "";
 			}
-			$q = "SELECT a.*, b.*, c.username, c.accountname FROM filezone a
+			$q = "SELECT a.*, b.*, c.username, c.clientname FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
 			AND b.filedate =
 				(
@@ -49,7 +100,7 @@ class Data extends CI_Model {
 				)
 				LEFT JOIN useraccount c ON a.fileowner = c.username
 				WHERE month=? AND year=?
-				AND c.accountname LIKE '%".$client."%'
+				AND c.clientname LIKE '%".$client."%'
 				AND a.fileentity LIKE '%".$entity."%'
 				ORDER BY filedate DESC";
 			$params = array($filemonth, $fileyear);
@@ -68,6 +119,18 @@ class Data extends CI_Model {
 		$params = array($fileid);
 		return $this->db->query($q, $params)->row_array();
 	}
+	public function get_account($username)
+	{
+		$q="SELECT * FROM useraccount u LEFT JOIN profile p ON u.username=p.username WHERE u.username=?";
+		$params = array($username);
+		return $this->db->query($q, $params)->row_array();
+	}
+	public function get_client($clientid)
+	{
+		$q="SELECT * FROM clients WHERE clientid=?";
+		$params = array($clientid);
+		return $this->db->query($q, $params)->row_array();
+	}
 	public function select_filetype()
 	{
 		$q = "SELECT * FROM dropdown WHERE category='filezone'";
@@ -75,14 +138,47 @@ class Data extends CI_Model {
 	}
 	public function select_client()
 	{
-		$q = "SELECT accountname FROM useraccount WHERE position='client'";
+		$q = "SELECT clientname FROM clients WHERE active=1";
 		return $this->db->query($q)->result_array();
 	}
 	public function select_entity($id)
 	{
-		$q = "SELECT * FROM dropdown WHERE category=?";
+		$q = "SELECT * FROM dropdown WHERE category='client' AND subcategory=?";
 		$param = array($id);
 		return $this->db->query($q,$param)->result_array();
+	}
+	public function insert_account($username, $accountname, $email, $position, $clientname, $emailcode)
+	{
+		$q = "INSERT INTO useraccount(username, accountname, email, position, clientname, emailcode, active) VALUES(?,?,?,?,?,?,'2')";
+		$params = array($username, $accountname, $email, $position, $clientname, $emailcode);
+		$this->db->query($q, $params);
+	}
+	public function update_account($accountname, $email, $position, $username, $clientname)
+	{
+		$q = "UPDATE useraccount SET accountname=?, email=?, position=?, clientname=? WHERE username=?";
+		$params = array($accountname, $email, $position, $clientname, $username);
+		$this->db->query($q, $params);
+	}
+	public function insert_client($clientname, $address, $industry)
+	{
+		$q = "INSERT INTO clients(clientname, address, industry, active) VALUES(?,?,?,'1')";
+		$params = array($clientname, $address, $industry);
+		$this->db->query($q, $params);
+	}
+	public function update_client($clientname, $address, $industry, $clientid)
+	{
+		$q = "UPDATE clients SET clientname=?, address=?, industry=? WHERE clientid=?";
+		$params = array($clientname, $address, $industry, $clientid);
+		$this->db->query($q, $params);
+	}
+	public function update_profile($address, $mobilenumber, $telephonenumber)
+	{
+		$q = "DELETE FROM profile WHERE username=?";
+		$params = array($_SESSION["username"]);
+		$this->db->query($q, $params);
+		$q = "INSERT INTO profile(address, mobilenumber, telephonenumber, username) VALUES(?,?,?,?)";
+		$params = array($address, $mobilenumber, $telephonenumber, $_SESSION["username"]);
+		$this->db->query($q, $params);
 	}
 	public function insert_file($filename, $filetype, $month, $year, $fileentity)
 	{
@@ -94,6 +190,25 @@ class Data extends CI_Model {
 	{
 		$q = "UPDATE filezone SET filename=?, filetype=?, month=?, year=?, fileentity=? WHERE fileid=?";
 		$params = array($filename, $filetype, $month, $year, $fileentity, $fileid);
+		$this->db->query($q, $params);
+	}
+	public function active_account($username, $active)
+	{
+		$q = "UPDATE useraccount SET active=? WHERE username=?";
+		$params = array($active, $username);
+		$this->db->query($q, $params);
+	}
+	public function active_client($clientid, $active)
+	{
+		$q = "UPDATE clients SET active=? WHERE clientid=?";
+		$params = array($active, $clientid);
+		$this->db->query($q, $params);
+	}
+	public function reset_account($username, $genpassword)
+	{
+		$pmd5 = md5($genpassword);
+		$q = "UPDATE useraccount SET password=?, active=1 WHERE username=?";
+		$params = array($pmd5, $username);
 		$this->db->query($q, $params);
 	}
 	public function delete_file($fileid)
