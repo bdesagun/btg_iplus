@@ -30,7 +30,7 @@
         </div>
         <!-- Page content -->
         <div class="container-fluid mt--6">
-            <div class="modal fade" id="modelPassword" tabindex="-1" role="dialog" aria-labelledby="accountLabel" aria-hidden="true">
+            <div class="modal fade" id="modalPassword" tabindex="-1" role="dialog" aria-labelledby="accountLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -128,7 +128,7 @@
                                     <h3 class="btn btn-outline-default btn-sm" onclick="saveProfile()">Save profile </h3>
                                 </div>
                                 <div class="col-4 text-right">
-                                    <a href="#!" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modelPassword" onclick="clearPassword()">Change Password</a>
+                                    <a href="#!" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalPassword" onclick="clearPassword()">Change Password</a>
                                 </div>
                             </div>
                         </div>
@@ -189,23 +189,52 @@
 </body>
 <script>
     GetProfile();
+    function testPassword(){
+        var numVal = 0;
+        var password8char = /^.{8,}$/;
+        var passwordOneUpper = /^(?=.*[A-Z]).*$/;
+        var passwordOneDigit = /^(?=.*[0-9]).*$/;
+        var passwordOneSpecial = /^(?=.*[#?!@$%^&*-]).*$/;
+        $('#validation_password').empty();
+        if(!password8char.test($("#newpassword").val())){
+            $('#validation_password').append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Password must be at least 8 characters.</span></div>");
+            numVal += 1;
+        }
+        if(!passwordOneUpper.test($("#newpassword").val())){
+            $('#validation_password').append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Password must have one uppercase character.</span></div>");
+            numVal += 1;
+        }
+        if(!passwordOneDigit.test($("#newpassword").val())){
+            $('#validation_password').append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Password must have one digit character.</span></div>");
+            numVal += 1;
+        }
+        if(!passwordOneSpecial.test($("#newpassword").val())){
+            $('#validation_password').append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Password must have one special character.</span></div>");
+            numVal += 1;
+        }
+        console.log(passwordOneUpper.test($("#newpassword").val()));
+        return numVal;
+    }
     function changePassword(){
+
         if ($("#newpassword").val() == $("#confirmpassword").val()){
-            var params;
-            params = {
-                currentpassword    : $("#currentpassword").val(),
-                newpassword        : $("#newpassword").val(),
-            };
-            $.post("change_password",params).done(function(data) {
-                if(data == 'accepted'){
-                    swal("Saved!", "Password successfully changed!", "success");
-                    $('#modalPassword').modal('toggle');
-                }else{
-                    $('#validation_password')
-                        .empty()
-                        .append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Incorrect current password!</span></div>");
-                }
-            });
+            if(testPassword() == 0){
+                var params;
+                params = {
+                    currentpassword    : $("#currentpassword").val(),
+                    newpassword        : $("#newpassword").val(),
+                };
+                $.post("change_password",params).done(function(data) {
+                    if(data == 'accepted'){
+                            swal("Saved!", "Password successfully changed!", "success");
+                            $('#modalPassword').modal('toggle');
+                    }else{
+                        $('#validation_password')
+                            .empty()
+                            .append("<div class='alert alert-danger alert-dismissible fade show' role='alert'><span class='alert-text'>Incorrect current password!</span></div>");
+                    }
+                });
+            }
         }else{
             $('#validation_password')
                 .empty()
@@ -216,6 +245,7 @@
         $("#currentpassword").val("");
         $("#newpassword").val("");
         $("#confirmpassword").val("");
+        $('#validation_password').empty();
     }
     function GetProfile(){
         $.post("get_profile").done(function(data) {

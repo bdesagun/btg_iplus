@@ -25,7 +25,7 @@ class Login extends CI_Controller {
 				$_SESSION["accountname"] = $data["accountname"];
 				$_SESSION["username"] = $data["username"];
 				$_SESSION["position"] = $data["position"];
-				$_SESSION["clientname"] = $data["clientname"];
+				$_SESSION["clientid"] = $data["clientid"];
 				echo 'verified';
 			}else{
 				echo 'inactive';

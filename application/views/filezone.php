@@ -35,6 +35,7 @@
                             <div class="col-7">
                                 <div class="form-group">
                                     <label class="form-control-label" id="fileName"></label>
+                                    <div id='val_fileName'></div>
                                 </div>
                             </div>
                             <div class="col-2">
@@ -48,6 +49,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">File Type</label>
                                     <select class="form-control" id="selectType"></select>
+                                    <div id='val_selectType'></div>
                                 </div>
                             </div>
                         </div>
@@ -56,6 +58,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Entity</label>
                                     <select class="form-control" id="selectEntity"></select>
+                                    <div id='val_selectEntity'></div>
                                 </div>
                             </div>
                         </div>
@@ -156,7 +159,45 @@
                 </div>
             </div>
         </div>
-
+        <div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filezoneLabel">File Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">This is to confirm that your uploaded files are complete and ready.</label>
+                                    <select class="form-control" id="selectEntity3" onchange="loadFilesList()"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Files:</label>
+                                    <div class="table-responsive py-4"  id="div_filelist_table"></div>
+                                    <div id='val_selectEntity3'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Confirm</button>
+                                    <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
             <div class="modal fade" id="modalApprove" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
                 <div class="modal-dialog modal-sm" role="document">
@@ -248,9 +289,9 @@
                     <div class="card">
                         <!-- Card header -->
                         <div class="card-header">
-                            <div class="form-group row">
+                            <div class="row">
                                 <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
-                                    <div class="col-md-2">
+                                    <div class="col-md-1">
                                         <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilezone" onclick="newFile()">Upload</button></h3>
                                     </div>
                                 <?php } ?>
@@ -268,7 +309,7 @@
                                     <div class="col-md-2"></div>
                                 <?php } ?>
                                 <?php if($_SESSION["position"] == "client" && $_SESSION["position"] != "admin"){ ?>
-                                    <div class="col-md-6"></div>
+                                    <div class="col-md-5"></div>
                                 <?php } ?>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadFiles()"></select>
@@ -276,6 +317,11 @@
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectYear" onchange="loadFiles()"></select>
                                 </div>
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalConfirm" onclick="GetEntity3()">Confirm File</button></h3>
+                                    </div>
+                                <?php } ?>
                             </div>
                         </div>
                         <div class="table-responsive py-4"  id="div_filezone_table"></div>
@@ -305,6 +351,17 @@
         };
         $.post("select_filezone", params).done(function(data) {
             $("#div_filezone_table").html(data);
+        });
+    }
+    function loadFilesList(){
+        $("#div_filelist_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            filemonth   : $("#selectMonth").val(),
+            fileyear    : $("#selectYear").val(),
+            entity      : $("#selectEntity3").val(),
+        };
+        $.post("select_filelist", params).done(function(data) {
+            $("#div_filelist_table").html(data);
         });
     }
     function GetMonth(){
@@ -367,6 +424,17 @@
             $("#selectEntity").prop('disabled', false);
         });
     }
+    function GetEntity3(){
+        $("#selectEntity3").prop('disabled', true);
+        $('#selectEntity3')
+            .empty()
+            .append('<option value="a">LOADING...</option>');
+        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+            $("#selectEntity3").html(data);
+            $("#selectEntity3").prop('disabled', false);
+        });
+        $("#div_filelist_table").empty();
+    }
     function GetEntity2(){
         if($('#selectClient').val() == 'ALL' || $('#selectClient').val() == 'LOADING...'){
             $("#selectEntity2").val('ALL');
@@ -395,7 +463,6 @@
             $("#selectClient").html(data);
             $("#selectClient").prop('disabled', false);
         });
-        GetEntity();
     }
     function newFile(){
         clearFile();
@@ -469,43 +536,71 @@
         });
     }
     function clearFile(){
-        $("#selectType").val("0");
+        $("#selectType").val("");
         $("#fileName").text("");
         $("#file_to_upload").val("");
+        $("#selectEntity").val("");
+        $("#val_selectType").empty();
+        $("#val_selectEntity").empty();
+        $("#val_fileName").empty();
     }
     function notifTest(){
         swal("Saved!", $("#file_to_upload").val(), "success");
         //showBasicMassage();
     }
+    function testFile(){
+        var numVal = 0;
+        if($("#selectType").val() == ''){
+            $("#val_selectType").empty().append("<label style='color:red; font-style:italic;'>Please select a file type</label>");
+            numVal += 1;
+        }
+        if($("#selectEntity").val() == ''){
+            $("#val_selectEntity").empty().append("<label style='color:red; font-style:italic;'>Please select an entity</label>");
+            numVal += 1;
+        }
+        if($("#fileName").text() == ''){
+            $("#val_fileName").empty().append("<label style='color:red; font-style:italic;'>Please choose a file</label>");
+            numVal += 1;
+        }
+        return numVal;
+    }
+    $('#selectType').on('change', function() {
+        $("#val_selectType").empty();
+    });
+    $('#selectEntity').on('change', function() {
+        $("#val_selectEntity").empty();
+    });
     function saveFile(){
-        var saveStatus = document.getElementById('filezoneLabel').innerHTML;
-        var params;
-        params = {
-            fileid     : file_id,
-            fileName    : $("#fileName").text(),
-            fileType    : $("#selectType").val(),
-            fileMonth   : $("#selectMonth2").val(),
-            fileYear    : $("#selectYear2").val(),
-            fileEntity  : $("#selectEntity").val(),
-        };
-        if(saveStatus == 'Upload File'){
-            $.post("insert_file",params).done(function(data) {
-                swal("Saved!", "File successfully submitted!", "success");
-                $('#modalFilezone').modal('toggle');
-                if ($("#file_to_upload").val() != ""){
-                    saveToFolder($("#selectEntity").val());
-                }
-                loadFiles();
-            });
-        }else{
-            $.post("update_file",params).done(function(data) {
-                swal("Saved!", "File successfully updated!", "success");
-                $('#modalFilezone').modal('toggle');
-                if ($("#file_to_upload").val() != ""){
-                    saveToFolder($("#selectEntity").val());
-                }
-                loadFiles();
-            });
+        if (testFile() == 0){
+            var saveStatus = document.getElementById('filezoneLabel').innerHTML;
+            var params;
+            params = {
+                fileid     : file_id,
+                fileName    : $("#fileName").text(),
+                fileType    : $("#selectType").val(),
+                fileMonth   : $("#selectMonth2").val(),
+                fileYear    : $("#selectYear2").val(),
+                fileEntity  : $("#selectEntity").val(),
+            };
+            if(saveStatus == 'Upload File'){
+                $.post("insert_file",params).done(function(data) {
+                    swal("Saved!", "File successfully submitted!", "success");
+                    $('#modalFilezone').modal('toggle');
+                    if ($("#file_to_upload").val() != ""){
+                        saveToFolder($("#selectEntity").val());
+                    }
+                    loadFiles();
+                });
+            }else{
+                $.post("update_file",params).done(function(data) {
+                    swal("Saved!", "File successfully updated!", "success");
+                    $('#modalFilezone').modal('toggle');
+                    if ($("#file_to_upload").val() != ""){
+                        saveToFolder($("#selectEntity").val());
+                    }
+                    loadFiles();
+                });
+            }
         }
     }
     function getFileID(id){
@@ -547,6 +642,7 @@
     $('input[type="file"]').change(function(e){
         var fileName = e.target.files[0].name;
         $("#fileName").text(fileName);
+        $("#val_fileName").empty();
     });
 </script>
 </html>

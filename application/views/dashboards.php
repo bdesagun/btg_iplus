@@ -17,7 +17,7 @@
         <?php require "header.php"; ?>
         <!-- Header -   ->
         <!-- Header -->
-        <div class="header pb-6">
+        <div class="header pb-2">
             <div class="container-fluid">
                 <div class="header-body">
                     <div class="row align-items-center py-4">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <!-- Page content -->
-        <div class="container-fluid mt--6">
+        <div class="container-fluid">
             <iframe src="https://www.example.com" frameborder="0" height="1000px" width="100%"></iframe>
         </div>
     </div>

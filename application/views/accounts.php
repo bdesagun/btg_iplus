@@ -42,6 +42,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Account Name:</label>
                                     <input class="form-control" id="accountname" type="text" autocomplete="off">
+                                    <div id='val_accountname'></div>
                                 </div>
                             </div>
                         </div>
@@ -50,6 +51,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Email:</label>
                                     <input class="form-control" id="email" type="text" autocomplete="off">
+                                    <div id='val_email'></div>
                                 </div>
                             </div>
                         </div>
@@ -58,10 +60,12 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Position</label>
                                     <select class="form-control" id="position" onchange="showClient()">
+                                        <option value="">Select Position</option>
                                         <option value="client">Client</option>
                                         <option value="staff">Staff</option>
                                         <option value="admin">Admin</option>
                                     </select>
+                                    <div id='val_position'></div>
                                 </div>
                             </div>
                         </div>
@@ -70,6 +74,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Client Name</label>
                                     <select class="form-control" id="clientname"></select>
+                                    <div id='val_clientname'></div>
                                 </div>
                             </div>
                         </div>
@@ -78,6 +83,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Username:</label>
                                     <input class="form-control" id="username" type="text" autocomplete="off">
+                                    <div id='val_username'></div>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +94,7 @@
                         </div>
                     </div>`
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-default" id="saveaccount" onclick="saveAccount()">Save</button>
+                        <button type="button" class="btn btn-outline-default" id="saveaccount" onclick="testAccount()">Save</button>
                         <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -207,30 +213,91 @@
             $("#clientrow").hide();
         }
     }
-    function saveAccount(){
-        $("#saveaccount").prop('disabled', true);
-        document.getElementById('saveaccount').innerHTML = 'Saving';
-        var saveStatus = document.getElementById('accountLabel').innerHTML;
-        var params;
-        params = {
-            username    : $("#username").val(),
-            accountname : $("#accountname").val(),
-            email       : $("#email").val(),
-            position    : $("#position").val(),
-            clientname  : $("#clientname").val(),
-        };
-        if(saveStatus == 'New Account'){
-            $.post("insert_account",params).done(function(data) {
-                swal("Saved!", "Account successfully created!", "success");
-                $('#modalAccount').modal('toggle');
-                loadAccount();
-            });
+    function testAccount(){
+        var numVal = 0;
+        if($("#accountname").val() == ''){
+            $("#val_accountname").empty().append("<label style='color:red; font-style:italic;'>Please input an account name</label>");
+            numVal += 1;
+        }
+        if($("#email").val() == ''){
+            $("#val_email").empty().append("<label style='color:red; font-style:italic;'>Please input an email</label>");
+            numVal += 1;
+        }
+        if($("#position").val() == ''){
+            $("#val_position").empty().append("<label style='color:red; font-style:italic;'>Please select a position</label>");
+            numVal += 1;
+        }
+        if ($("#position").val() == 'client'){
+            if($("#clientname").val() == ''){
+                $("#val_clientname").empty().append("<label style='color:red; font-style:italic;'>Please select a client</label>");
+                numVal += 1;
+            }
+        }
+        if($("#username").val() == ''){
+            $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Please input a username</label>");
+            numVal += 1;
+            return numVal;
         }else{
-            $.post("update_account",params).done(function(data) {
-                swal("Saved!", "Account successfully updated!", "success");
-                $('#modalAccount').modal('toggle');
-                loadAccount();
+            if($("#username").val().length < 8){
+                $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username must be at least 8 characters.</label>");
+                numVal += 1;
+            }
+            var params;
+            params = {
+                username    : $("#username").val(),
+            };
+            $.post("select_username", params).done(function(data) {
+                if (data == 'existing'){
+                    $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username already exists.</label>");
+                    numVal += 1;
+                    saveAccount(numVal);
+                }else{
+                    saveAccount(numVal);
+                }
             });
+        }
+    }
+    $('#accountname').on('input', function() {
+        $("#val_accountname").empty();
+    });
+    $('#email').on('input', function() {
+        $("#val_email").empty();
+    });
+    $('#position').on('change', function() {
+        $("#val_position").empty();
+    });
+    $('#clientname').on('change', function() {
+        $("#val_clientname").empty();
+    });
+    $('#username').on('input', function() {
+        $("#val_username").empty();
+    });
+    function saveAccount(numVal){
+        if (numVal == 0){
+            $("#saveaccount").prop('disabled', true);
+            document.getElementById('saveaccount').innerHTML = 'Saving';
+            var saveStatus = document.getElementById('accountLabel').innerHTML;
+            var params;
+            params = {
+                username    : $("#username").val(),
+                accountname : $("#accountname").val(),
+                email       : $("#email").val(),
+                position    : $("#position").val(),
+                clientid    : $("#clientname").val(),
+            };
+            if(saveStatus == 'New Account'){
+                $.post("insert_account",params).done(function(data) {
+                    swal("Saved!", "Account successfully created!", "success");
+                    $('#modalAccount').modal('toggle');
+                    loadAccount();
+                });
+            }else{
+                $.post("update_account",params).done(function(data) {
+                    swal("Saved!", "Account successfully updated!", "success");
+                    $('#modalAccount').modal('toggle');
+                    loadAccount();
+                });
+            }
         }
     }
     function activeAccount(){
@@ -310,14 +377,20 @@
     }
     function clearAccount(){
         document.getElementById('username').type = 'text';
-        $("#position").val("client");
+        $("#position").val("");
         $("#accountname").val("");
         $("#email").val("");
         $("#username").val("");
         $("#clientname").val("");
         $("#username").prop('disabled', false);
         $("#saveaccount").prop('disabled', false);
+        $("#clientrow").hide();
         document.getElementById('saveaccount').innerHTML = 'Save';
+        $("#val_accountname").empty();
+        $("#val_email").empty();
+        $("#val_position").empty();
+        $("#val_clientname").empty();
+        $("#val_username").empty();
     }
 </script>
 </html>

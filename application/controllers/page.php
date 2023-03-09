@@ -55,6 +55,15 @@ class Page extends CI_Controller
 			redirect("page/home");
 		}
 	}
+	function maintenance()
+	{
+		if ($_SESSION["position"] == "admin") {
+			$_SESSION["activepage"] = "N/A";
+			$this->load->view("maintenance");
+		}else{
+			redirect("page/home");
+		}
+	}
 	function profile()
 	{
 		$_SESSION["activepage"] = "N/A";
@@ -69,6 +78,16 @@ class Page extends CI_Controller
 		}
 		else {
 			echo 'denied';
+		}
+	}
+	function select_username(){
+		$post = $this->security->xss_clean($this->input->post());
+		$data = $this->data->select_username($post["username"]);
+		if (!empty($data)) {
+			echo 'existing';
+		}
+		else {
+			echo 'available';
 		}
 	}
 	function select_account_list()
@@ -105,20 +124,35 @@ class Page extends CI_Controller
 		}
 		if (isset($post["client"])) {
 			if ($post["client"] == 'LOADING...') {
-				$client = "";
+				$client = "%%";
 			} else {
 				$client = $post["client"];
 			}
 		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
-				$entity = "";
+				$entity = "%%";
 			} else {
 				$entity = $post["entity"];
 			}
 		}
 		$data["filezone"] = $this->data->select_filezone($post["filemonth"], $post["fileyear"], $client, $entity);
 		$this->load->view("filezone_table", $data);
+	}
+	function select_filelist()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data["filezone"] = $this->data->select_filelist($post["filemonth"], $post["fileyear"], $post["entity"]);
+		$this->load->view("filelist", $data);
+	}
+	function select_checklist()
+	{
+		if ($_SESSION["position"] == "admin") {
+			$data["checklist"] = $this->data->select_checklist();
+			$this->load->view("maintenance/checklist_table", $data);
+		}else{
+			redirect("page/home");
+		}
 	}
 	function select_filehistory()
 	{
@@ -155,7 +189,7 @@ class Page extends CI_Controller
 	{
 		$option = "";
 		$res = $this->data->select_filetype();
-		$option .= "<option value='0'>Select File Type</option>";
+		$option .= "<option value=''>Select File Type</option>";
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
 		}
@@ -167,7 +201,7 @@ class Page extends CI_Controller
 		$res = $this->data->select_client();
 		$option .= "<option value='ALL'>ALL</option>";
 		foreach ($res as $v) {
-			$option .= "<option value='" . $v["clientname"] . "'>" . $v["clientname"] . "</option>";
+			$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
 		}
 		echo $option;
 	}
@@ -177,7 +211,7 @@ class Page extends CI_Controller
 		$res = $this->data->select_client();
 		$option .= "<option value=''>Select Client</option>";
 		foreach ($res as $v) {
-			$option .= "<option value='" . $v["subcategory"] . "'>" . $v["subcategory"] . "</option>";
+			$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
 		}
 		echo $option;
 	}
@@ -188,17 +222,25 @@ class Page extends CI_Controller
 		if (isset($post["id"])) {
 			$client = $post["id"];
 		} else {
-			$client = $_SESSION["clientname"];
+			$client = $_SESSION["clientid"];
 		}
 		$option = "";
 		$res = $this->data->select_entity($client);
 		if ($_SESSION["position"] != "client") {
 			$option .= "<option value='ALL'>ALL</option>";
+		}else{
+			$option .= "<option value=''>Select Entity</option>";
 		}
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
 		}
 		echo $option;
+	}
+	function select_entity_list()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data["entity"] = $this->data->select_entity($post["clientid"]);
+		$this->load->view("maintenance/entity_table", $data);
 	}
 	function insert_account(){
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -215,7 +257,7 @@ class Page extends CI_Controller
 			$post["accountname"],
 			$post["email"],
 			$post["position"],
-			$post["clientname"],
+			$post["clientid"],
 			$data["emailcode"]
 		);
         $this->email->set_newline("\r\n");
@@ -248,6 +290,22 @@ class Page extends CI_Controller
 			$post["clientname"],
 			$post["address"],
 			$post["industry"]
+		);
+	}
+	function insert_entity()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_entity(
+			$post["clientid"],
+			$post["entity"]
+		);
+	}
+	function delete_entity()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->delete_entity(
+			$post["value"],
+			$post["subcategory"]
 		);
 	}
 	function update_client()

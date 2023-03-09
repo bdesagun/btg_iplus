@@ -53,6 +53,12 @@
                                 <span>Clients</span>
                             </a>
                         <?php } ?>
+                        <?php if($_SESSION["position"] == "admin"){ ?>
+                            <a href="maintenance" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Maintenance</span>
+                            </a>
+                        <?php } ?>
                         <div class="dropdown-divider"></div>
                         <a href="force_logout" class="dropdown-item">
                             <i class="ni ni-user-run"></i>

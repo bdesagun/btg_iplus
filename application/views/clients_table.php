@@ -17,12 +17,12 @@
                     <td><?php echo $row['status']; ?></td>
                     <td>
                         <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalClient" onclick="editClient('<?php echo $row['clientid']; ?>')">Edit</button>
-
                         <?php if($row['active']=='1'){ ?>
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalActivation" onclick="viewActivationClient('<?php echo $row['active']; ?>','<?php echo $row['clientid']; ?>')">Deactivate</button>
                         <?php }elseif($row['active']=='0'){ ?>
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalActivation" onclick="viewActivationClient('<?php echo $row['active']; ?>','<?php echo $row['clientid']; ?>')">Activate</button>
                         <?php } ?>
+                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalEntity" onclick="viewEntity('<?php echo $row['clientid']; ?>')">Entity</button>
                     </td>
                 </tr>
         <?php } ?>

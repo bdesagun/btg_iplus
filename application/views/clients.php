@@ -36,12 +36,13 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                `    <div class="modal-body">
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label class="form-control-label">Client Name:</label>
                                     <input class="form-control" id="clientname" type="text" autocomplete="off">
+                                    <div id='val_clientname'></div>
                                 </div>
                             </div>
                         </div>
@@ -50,6 +51,7 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Address:</label>
                                     <input class="form-control" id="address" type="text" autocomplete="off">
+                                    <div id='val_address'></div>
                                 </div>
                             </div>
                         </div>
@@ -58,12 +60,45 @@
                                 <div class="form-group">
                                     <label class="form-control-label">Industry:</label>
                                     <input class="form-control" id="industry" type="text" autocomplete="off">
+                                    <div id='val_industry'></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-default" id="saveaccount" onclick="saveAccount()">Save</button>
+                        <button type="button" class="btn btn-outline-default" onclick="saveClient()">Save</button>
+                        <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalEntity" tabindex="-1" role="dialog" aria-labelledby="entityLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="entityLabel">Entity List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-9">
+                                    <input class="form-control" id="entity" type="text" placeholder="Input Entity Name" autocomplete="off">
+                            </div>
+                            <div class="col-3 text-right">
+                                <button type="button" class="btn btn-outline-default" onclick="addEntity()">Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <div class="table-responsive py-4"  id="div_entity_table"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -131,27 +166,89 @@
             $("#div_client_table").html(data);
         });
     }
-    function saveAccount(){
-        var saveStatus = document.getElementById('clientLabel').innerHTML;
+    function viewEntity(id){
+        $("#entity").val("");
+        $("#div_entity_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        client_id = id;
         var params;
         params = {
-            clientid    : client_id,
-            clientname  : $("#clientname").val(),
-            address     : $("#address").val(),
-            industry    : $("#industry").val(),
+            clientid : id,
         };
-        if(saveStatus == 'New Client'){
-            $.post("insert_client",params).done(function(data) {
-                swal("Saved!", "Client successfully created!", "success");
-                $('#modalClient').modal('toggle');
-                loadClient();
+        $.post("select_entity_list", params).done(function(data) {
+            $("#div_entity_table").html(data);
+        });
+    }
+    function addEntity(){
+        if ($("#entity").val() != ''){
+            var params;
+            params = {
+                clientid    : client_id,
+                entity      : $("#entity").val(),
+            };
+            $.post("insert_entity",params).done(function(data) {
+                viewEntity(client_id);
+                $("#entity").val("");
             });
-        }else{
-            $.post("update_client",params).done(function(data) {
-                swal("Saved!", "Client successfully updated!", "success");
-                $('#modalClient').modal('toggle');
-                loadClient();
-            });
+        }
+    }
+    function deleteEntity(value, subcategory){
+        var params;
+        params = {
+            value          : value,
+            subcategory    : subcategory
+        };
+        $.post("delete_entity",params).done(function(data) {
+            viewEntity(client_id);
+        });
+    }
+    function testClient(){
+        var numVal = 0;
+        if($("#clientname").val() == ''){
+            $("#val_clientname").empty().append("<label style='color:red; font-style:italic;'>Please input a client name</label>");
+            numVal += 1;
+        }
+        if($("#address").val() == ''){
+            $("#val_address").empty().append("<label style='color:red; font-style:italic;'>Please input an address</label>");
+            numVal += 1;
+        }
+        if($("#industry").val() == ''){
+            $("#val_industry").empty().append("<label style='color:red; font-style:italic;'>Please input an industry</label>");
+            numVal += 1;
+        }
+        return numVal;
+    }
+    $('#clientname').on('input', function() {
+        $("#val_clientname").empty();
+    });
+    $('#address').on('input', function() {
+        $("#val_address").empty();
+    });
+    $('#industry').on('input', function() {
+        $("#val_industry").empty();
+    });
+    function saveClient(){
+        if (testClient() == 0){
+            var saveStatus = document.getElementById('clientLabel').innerHTML;
+            var params;
+            params = {
+                clientid    : client_id,
+                clientname  : $("#clientname").val(),
+                address     : $("#address").val(),
+                industry    : $("#industry").val(),
+            };
+            if(saveStatus == 'New Client'){
+                $.post("insert_client",params).done(function(data) {
+                    swal("Saved!", "Client successfully created!", "success");
+                    $('#modalClient').modal('toggle');
+                    loadClient();
+                });
+            }else{
+                $.post("update_client",params).done(function(data) {
+                    swal("Saved!", "Client successfully updated!", "success");
+                    $('#modalClient').modal('toggle');
+                    loadClient();
+                });
+            }
         }
     }
     function activeClient(){
@@ -205,6 +302,9 @@
         $("#clientname").val("");
         $("#address").val("");
         $("#industry").val("");
+        $("#val_clientname").empty();
+        $("#val_address").empty();
+        $("#val_industry").empty();
     }
 </script>
 </html>
