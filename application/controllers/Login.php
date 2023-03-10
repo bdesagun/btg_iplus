@@ -10,8 +10,9 @@ class Login extends CI_Controller {
 		redirect("login/login_screen");
 	}
 	function login_screen() {
-		$_SESSION["systemname"] = "Sample Website";
-		$this->load->view("blankpage");
+		$_SESSION["systemname"] = "BTG Intelligence Plus";
+		$_SESSION["theme"] = "theme-light-green";
+		$this->load->view("login");
 	}
 	function session(){
 		echo json_encode($_SESSION);
@@ -20,28 +21,28 @@ class Login extends CI_Controller {
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->select_account($post["username"],$post["password"]);
 		if (!empty($data)) {
-			$_SESSION["fname"] = $data["fname"]; 
-			$_SESSION["username"] = $data["username"]; 
-			$_SESSION["password"] = $data["password"];
-			echo 'verified';
+			if($data["active"] == '1'){
+				$_SESSION["accountname"] = $data["accountname"];
+				$_SESSION["username"] = $data["username"];
+				$_SESSION["position"] = $data["position"];
+				$_SESSION["clientid"] = $data["clientid"];
+				echo 'verified';
+			}else{
+				echo 'inactive';
+			}
 		}
 		else {
 			echo 'denied';
 		}
 	}
-	function save_comid(){
-		$_SESSION['comid'] = $_POST['comid'];
-		$_SESSION["comname"] = $this->data->select_comname();
-	}
-	function select_company(){
-		if(empty($_SESSION["username"])) {
-			redirect('login');
-		}
-		$data["company"] = $this->data->select_company();
-		$this->load->view("company",$data);
+	function homepage(){
+		redirect("page");
 	}
 	function force_logout() {
 		session_destroy();
-		redirect("login/login_screen");
+		redirect("login");
 	}
+	// function encrypt_pass(){
+	// 	echo md5("client2");
+	// }
 }

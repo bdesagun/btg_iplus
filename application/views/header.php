@@ -31,7 +31,7 @@
                         <div class="media align-items-center">
                             <div class="media-body ml-2 d-none d-lg-block">
                                 <i class="ni ni-circle-08"></i>
-                                <span class="mb-0 text-sm  font-weight-bold">Juan Dela Cruz</span>
+                                <span class="mb-0 text-sm  font-weight-bold"><?php echo $_SESSION["accountname"]; ?></span>
                             </div>
                         </div>
                     </a>
@@ -39,12 +39,28 @@
                         <div class="dropdown-header noti-title">
                             <h6 class="text-overflow m-0">Welcome!</h6>
                         </div>
-                        <a href="#!" class="dropdown-item">
+                        <a href="profile" class="dropdown-item">
                             <i class="ni ni-single-02"></i>
                             <span>My profile</span>
                         </a>
+                        <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                            <a href="accounts" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Accounts</span>
+                            </a>
+                            <a href="clients" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Clients</span>
+                            </a>
+                        <?php } ?>
+                        <?php if($_SESSION["position"] == "admin"){ ?>
+                            <a href="maintenance" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Maintenance</span>
+                            </a>
+                        <?php } ?>
                         <div class="dropdown-divider"></div>
-                        <a href="#!" class="dropdown-item">
+                        <a href="force_logout" class="dropdown-item">
                             <i class="ni ni-user-run"></i>
                             <span>Logout</span>
                         </a>
