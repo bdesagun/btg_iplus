@@ -29,11 +29,11 @@ class Verify extends CI_Controller {
 		$this->load->view("verification",$data);
 	}
 	function homepage(){
-		redirect("page");
+		redirect("Page");
 	}
 	function force_logout() {
 		session_destroy();
-		redirect("login");
+		redirect("Login");
 	}
 	// function encrypt_pass(){
 	// 	echo md5("client2");

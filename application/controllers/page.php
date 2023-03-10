@@ -15,7 +15,7 @@ class Page extends CI_Controller
 	}
 	function index()
 	{
-		redirect("page/home");
+		redirect("Page/home");
 	}
 	function home()
 	{
@@ -43,7 +43,7 @@ class Page extends CI_Controller
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("accounts");
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 	}
 	function clients()
@@ -52,7 +52,7 @@ class Page extends CI_Controller
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("clients");
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 	}
 	function maintenance()
@@ -61,7 +61,7 @@ class Page extends CI_Controller
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("maintenance");
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 	}
 	function profile()
@@ -96,7 +96,7 @@ class Page extends CI_Controller
 			$data["acclist"] = $this->data->select_account_list();
 			$this->load->view("accounts_table", $data);
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 		//$post = $this->security->xss_clean($this->input->post());
 	}
@@ -106,7 +106,7 @@ class Page extends CI_Controller
 			$data["clients"] = $this->data->select_client_list();
 			$this->load->view("clients_table", $data);
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 		//$post = $this->security->xss_clean($this->input->post());
 	}
@@ -151,7 +151,7 @@ class Page extends CI_Controller
 			$data["checklist"] = $this->data->select_checklist();
 			$this->load->view("maintenance/checklist_table", $data);
 		}else{
-			redirect("page/home");
+			redirect("Page/home");
 		}
 	}
 	function select_filehistory()

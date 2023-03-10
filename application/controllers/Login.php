@@ -7,7 +7,7 @@ class Login extends CI_Controller {
 		$this->load->model("data");
 	}
 	function index() {
-		redirect("login/login_screen");
+		redirect("Login/login_screen");
 	}
 	function login_screen() {
 		$_SESSION["systemname"] = "BTG Intelligence Plus";
@@ -36,11 +36,11 @@ class Login extends CI_Controller {
 		}
 	}
 	function homepage(){
-		redirect("page");
+		redirect("Page");
 	}
 	function force_logout() {
 		session_destroy();
-		redirect("login");
+		redirect("Login");
 	}
 	// function encrypt_pass(){
 	// 	echo md5("client2");

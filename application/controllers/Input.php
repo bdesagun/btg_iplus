@@ -10,7 +10,7 @@ class Input extends CI_Controller {
 		// }
 	}
 	function index() {
-		redirect("input/mainpage");
+		redirect("Input/mainpage");
 	}
 	function mainpage() {
 		$_SESSION["systemname"] = "OTala Occupational Therapy Database Management System";
