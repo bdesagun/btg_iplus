@@ -2,9 +2,9 @@
 <nav class="navbar navbar-top navbar-expand navbar-light bg-secondary border-bottom">
     <div class="container-fluid">
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <h4>
-                <?php echo $_SESSION["systemname"]; ?>
-            </h4>
+            <h2>
+                <?php echo $_SESSION["systemname"]; ?><?php if($_SESSION["position"] == "client"){ echo " ( ".$_SESSION["clientname"]." )";}; ?>
+            </h2>
             <!-- Navbar links -->
             <ul class="navbar-nav align-items-center ml-md-auto">
                 <li class="nav-item d-xl-none">

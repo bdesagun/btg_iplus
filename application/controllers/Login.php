@@ -26,6 +26,9 @@ class Login extends CI_Controller {
 				$_SESSION["username"] = $data["username"];
 				$_SESSION["position"] = $data["position"];
 				$_SESSION["clientid"] = $data["clientid"];
+				$_SESSION["clientname"] = $data["clientname"];
+				$_SESSION["clientaccess"] = $data["clientaccess"];
+				$_SESSION["entityaccess"] = $data["entityaccess"];
 				echo 'verified';
 			}else{
 				echo 'inactive';
@@ -43,6 +46,6 @@ class Login extends CI_Controller {
 		redirect("Login");
 	}
 	// function encrypt_pass(){
-	// 	echo md5("client2");
+	// 	echo md5("reviewer");
 	// }
 }

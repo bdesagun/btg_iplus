@@ -30,12 +30,14 @@ class Page extends CI_Controller
 	function workflow()
 	{
 		$_SESSION["activepage"] = "WORKFLOW";
-		$this->load->view("workflow");
+		$data = $this->data->select_iframe_page('Workflow');
+		$this->load->view("workflow",$data);
 	}
 	function dashboards()
 	{
 		$_SESSION["activepage"] = "DASHBOARDS";
-		$this->load->view("dashboards");
+		$data = $this->data->select_iframe_page('Dashboard');
+		$this->load->view("dashboards",$data);
 	}
 	function accounts()
 	{
@@ -59,10 +61,15 @@ class Page extends CI_Controller
 	{
 		if ($_SESSION["position"] == "admin") {
 			$_SESSION["activepage"] = "N/A";
-			$this->load->view("maintenance");
+			$data["iframe"] = $this->data->select_iframe();
+			$this->load->view("maintenance", $data);
 		}else{
 			redirect("Page/home");
 		}
+	}
+	function update_iframe(){
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_iframe($post["pagename"],$post["pageurl"]);
 	}
 	function profile()
 	{
@@ -131,18 +138,61 @@ class Page extends CI_Controller
 		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
-				$entity = "%%";
+				$entity = "";
 			} else {
 				$entity = $post["entity"];
 			}
 		}
+		if($_SESSION["position"] == "client"){
+			$client = $_SESSION["clientid"];
+		}
 		$data["filezone"] = $this->data->select_filezone($post["filemonth"], $post["fileyear"], $client, $entity);
 		$this->load->view("filezone_table", $data);
+	}
+	function select_filereview()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$client = "";
+		$entity = "";
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		if (isset($post["client"])) {
+			if ($post["client"] == 'LOADING...') {
+				$client = "%%";
+			} else {
+				$client = $post["client"];
+			}
+		}
+		if (isset($post["entity"])) {
+			if ($post["entity"] == 'LOADING...') {
+				$entity = "";
+			} else {
+				$entity = $post["entity"];
+			}
+		}
+		if($_SESSION["position"] == "client"){
+			$client = $_SESSION["clientid"];
+		}
+		$data["filereview"] = $this->data->select_filereview($post["filemonth"], $post["fileyear"], $client, $entity);
+		$this->load->view("filereview_table", $data);
 	}
 	function select_filelist()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$data["filezone"] = $this->data->select_filelist($post["filemonth"], $post["fileyear"], $post["entity"]);
+		$client = "";
+		if (isset($post["clientid"])) {
+			$client = $post["clientid"];
+		}else{
+			$client = $_SESSION["clientid"];
+		}
+		$data["filezone"] = $this->data->select_filelist($post["filemonth"], $post["fileyear"], $client, $post["entity"], $post["filecategory"]);
+		$data["fileaudit"] = $this->data->select_fileaudittrail($post["filemonth"], $post["fileyear"], $client, $post["entity"]);
+		$data["filecategory"] = $post["filecategory"];
 		$this->load->view("filelist", $data);
 	}
 	function select_checklist()
@@ -236,11 +286,44 @@ class Page extends CI_Controller
 		}
 		echo $option;
 	}
+	function select_entity_staff()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$option = "";
+		$res = $this->data->select_entity_staff($post["fileMonth"], $post["fileYear"], $post["clientid"], $post["trailstatus"]);
+		$option .= "<option value=''>Select Entity</option>";
+		foreach ($res as $v) {
+			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
+		}
+		echo $option;
+	}
 	function select_entity_list()
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$data["entity"] = $this->data->select_entity($post["clientid"]);
 		$this->load->view("maintenance/entity_table", $data);
+	}
+	function select_access_list()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data["access"] = $this->data->select_access_list($post["username"]);
+		$this->load->view("maintenance/access_table", $data);
+	}
+	function insert_access(){
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_access(
+			$post["clientid"],
+			$post["entity"],
+			$post["username"]
+		);
+	}
+	function delete_access(){
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->delete_access(
+			$post["clientid"],
+			$post["entity"],
+			$post["username"]
+		);
 	}
 	function insert_account(){
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
@@ -327,12 +410,133 @@ class Page extends CI_Controller
 			$post["telephonenumber"]
 		);
 	}
+	function insert_fileaudittrail()
+	{
+		//($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
+		$post = $this->security->xss_clean($this->input->post());
+		$client = "";
+		if (isset($post["clientid"])) {
+			$client = $post["clientid"];
+		}else{
+			$client = $_SESSION["clientid"];
+		}
+
+		$this->data->insert_fileaudittrail(
+			$client,
+			$post["fileEntity"],
+			$post["fileMonth"],
+			$post["fileYear"],
+			$_SESSION["username"],
+			$post["trailstatus"],
+			$post["trailstatus"]
+		);
+		if($post["trailstatus"] == 'Confirmed'){
+			$data = $this->data->select_email_recipient('staff', $client, $post["fileEntity"]);
+			$data["clientdetail"] = $this->data->get_client($client);
+			$data["entityname"] = $post["fileEntity"];
+			$to = $data["emails"];
+			$subject = 'BTGI Plus Notification';
+			$message = $this->load->view('mail_template/email_client_confirm',$data,true);
+			$from = $this->config->item('smtp_user');
+
+			$this->email->set_newline("\r\n");
+			$this->email->from($from);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+
+			if ($this->email->send()) {
+				echo 'Your Email has successfully been sent.';
+			} else {
+				show_error($this->email->print_debugger());
+			}
+		}
+		if($post["trailstatus"] == 'Approved'){
+			$data = $this->data->select_email_recipient('reviewer', $client, $post["fileEntity"]);
+			$data["clientdetail"] = $this->data->get_client($client);
+			$data["entityname"] = $post["fileEntity"];
+			$to = $data["emails"];
+			$subject = 'BTGI Plus Notification';
+			$message = $this->load->view('mail_template/email_staff_confirm',$data,true);
+			$from = $this->config->item('smtp_user');
+
+			$this->email->set_newline("\r\n");
+			$this->email->from($from);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+
+			if ($this->email->send()) {
+				echo 'Your Email has successfully been sent.';
+			} else {
+				show_error($this->email->print_debugger());
+			}
+		}
+		if($post["trailstatus"] == 'Reviewed'){
+			$data = $this->data->select_email_recipient('client', $client, '');
+			$data["clientdetail"] = $this->data->get_client($client);
+			$data["entityname"] = $post["fileEntity"];
+			$data["month"] = $post["fileMonth"];
+			$data["year"] = $post["fileYear"];
+			$to = $data["emails"];
+			$subject = 'BTGI Plus Notification';
+			$message = $this->load->view('mail_template/email_reviewer_approve',$data,true);
+			$from = $this->config->item('smtp_user');
+
+			$this->email->set_newline("\r\n");
+			$this->email->from($from);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+
+			if ($this->email->send()) {
+				echo 'Your Email has successfully been sent.';
+			} else {
+				show_error($this->email->print_debugger());
+			}
+		}
+		if($post["trailstatus"] == 'ConfirmedBAS'){
+			$data = $this->data->select_email_recipient('staff', $client, $post["fileEntity"]);
+			$data["clientdetail"] = $this->data->get_client($client);
+			$data["entityname"] = $post["fileEntity"];
+			$data["month"] = $post["fileMonth"];
+			$data["year"] = $post["fileYear"];
+			$to = $data["emails"];
+			$subject = 'BTGI Plus Notification';
+			$message = $this->load->view('mail_template/email_client_approve',$data,true);
+			$from = $this->config->item('smtp_user');
+
+			$this->email->set_newline("\r\n");
+			$this->email->from($from);
+			$this->email->to($to);
+			$this->email->subject($subject);
+			$this->email->message($message);
+
+			if ($this->email->send()) {
+				echo 'Your Email has successfully been sent.';
+			} else {
+				show_error($this->email->print_debugger());
+			}
+		}
+	}
 	function insert_file()
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_file(
 			$post["fileName"],
 			$post["fileType"],
+			$post["fileMonth"],
+			$post["fileYear"],
+			$post["fileEntity"]
+		);
+		$this->data->insert_history("Submitted", "", "");
+	}
+	function insert_filereview()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_filereview(
+			$post["fileName"],
+			$post["clientid"],
 			$post["fileMonth"],
 			$post["fileYear"],
 			$post["fileEntity"]
@@ -354,6 +558,18 @@ class Page extends CI_Controller
 		if (!empty($data)) {
 			$this->data->insert_history("Updated", $post["fileid"], "");
 		}
+	}
+	function update_filereview()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_filereview(
+			$post["fileid"],
+			$post["fileName"],
+			$post["clientid"],
+			$post["fileMonth"],
+			$post["fileYear"],
+			$post["fileEntity"]
+		);
 	}
 	function view_filehistory()
 	{
@@ -427,6 +643,22 @@ class Page extends CI_Controller
 		$config['max_size'] = 20000000;
 		$this->load->library('upload', $config);
 		$this->upload->do_upload('file_to_upload');
+		$res = $this->upload->data();
+		$_SESSION["fileName"] = $res["file_name"];
+	}
+	function upload_file_review()
+	{
+		$get = $this->security->xss_clean($this->input->get());
+		if (!is_dir('assets/files/' . $get["clientid"] . '/' . $get["entity"])) {
+			mkdir('./assets/files/' . $get["clientid"] . '/' . $get["entity"], 0777, true);
+			$dir_exist = false; // dir not exist
+		}
+		$config['upload_path'] = 'assets/files/' . $get["clientid"] . '/' . $get["entity"] . '/';
+		$config['allowed_types'] = '*';
+		$config['overwrite'] = TRUE;
+		$config['max_size'] = 20000000;
+		$this->load->library('upload', $config);
+		$this->upload->do_upload('file_to_upload_review');
 		$res = $this->upload->data();
 		$_SESSION["fileName"] = $res["file_name"];
 	}

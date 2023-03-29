@@ -10,11 +10,46 @@ class Data extends CI_Model {
 	public function select_account($username, $password)
 	{
 		$pmd5 = md5($password);
-		return $this->db->query("SELECT * FROM useraccount WHERE username = ? AND password = ?", array($username, $pmd5))->row_array();
+		return $this->db->query(
+			"SELECT
+				u.*,
+				c.clientname,
+				(SELECT GROUP_CONCAT(clientid) AS emails FROM userentity WHERE username = ?) AS clientaccess,
+				(SELECT GROUP_CONCAT(CONCAT('''', entity, '''' )) AS emails FROM userentity WHERE username = ?) AS entityaccess
+			FROM
+				useraccount u
+			LEFT JOIN clients c ON u.clientid=c.clientid
+			WHERE u.username = ? AND u.password = ?", array($username, $username, $username, $pmd5)
+		)->row_array();
 	}
 	public function select_username($username)
 	{
 		return $this->db->query("SELECT * FROM useraccount WHERE username = ?", array($username))->row_array();
+	}
+	public function select_iframe()
+	{
+		return $this->db->query("SELECT * FROM iframe")->result_array();
+	}
+	public function select_iframe_page($pagename)
+	{
+		return $this->db->query("SELECT pageurl FROM iframe WHERE pagename = ?", array($pagename))->row_array();
+	}
+	public function update_iframe($pagename,$pageurl)
+	{
+		$q = "UPDATE iframe SET pageurl=? WHERE pagename=?";
+		$params = array($pageurl,$pagename);
+		$this->db->query($q, $params);
+	}
+	public function select_email_recipient($position,$clientid,$entity)
+	{
+		if($position != 'client'){
+			$params = array($position,$clientid,$entity);
+			return $this->db->query("SELECT GROUP_CONCAT(a.email) AS emails FROM useraccount a WHERE a.position = ?
+			AND (SELECT COUNT(*) FROM userentity b WHERE b.clientid=? AND b.entity=? AND a.username=b.username) > 0", $params)->row_array();
+		}else{
+			$params = array($position,$clientid);
+			return $this->db->query("SELECT GROUP_CONCAT(a.email) AS emails FROM useraccount a WHERE a.position = ? AND clientid = ?", $params)->row_array();
+		}
 	}
 	public function verify_account($emailcode)
 	{
@@ -57,7 +92,8 @@ class Data extends CI_Model {
 			LEFT JOIN
 				clients c
 			ON
-				u.clientid=c.clientid";
+				u.clientid=c.clientid
+			ORDER BY accountname";
 
 		return $this->db->query($q)->result_array();
 	}
@@ -77,6 +113,22 @@ class Data extends CI_Model {
 
 		return $this->db->query($q)->result_array();
 	}
+	public function select_access_list($username)
+	{
+		$q = "SELECT
+			a.*,
+			b.clientname
+		FROM
+			userentity a
+		LEFT JOIN
+			clients b
+		ON
+			a.clientid = b.clientid
+		WHERE
+			username=?";
+		$params = array($username);
+		return $this->db->query($q,$params)->result_array();
+	}
 	public function select_checklist()
 	{
 		// 1 - Active
@@ -89,24 +141,18 @@ class Data extends CI_Model {
 				END AS 'status'
 			FROM
 				checklist";
-
 		return $this->db->query($q)->result_array();
 	}
-	public function select_fileaudittrail($filemonth, $fileyear, $client, $entity)
+	public function select_filelist($filemonth, $fileyear, $client, $entity, $filecategory)
 	{
-
-	}
-	public function select_filelist($filemonth, $fileyear, $entity)
-	{
-		$q = "SELECT filename FROM filezone a
-			WHERE month=? AND year=? AND clientid = ? AND fileentity = ?";
-		$params = array($filemonth, $fileyear, $_SESSION["clientid"], $entity);
-		return $this->db->query($q,$params)->result_array();
-	}
-	public function select_filezone($filemonth, $fileyear, $client, $entity)
-	{
-		if($_SESSION["position"] == "client"){
-			$q = "SELECT *, '". $_SESSION["username"] ."' as username FROM filezone a
+		$q = "SELECT
+				filename,
+				filestatus,
+				CASE
+					WHEN filestatus = 'Approved' THEN 'green'
+					ELSE 'orange'
+				END AS filecolor
+			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
 			AND b.filedate =
 				(
@@ -114,17 +160,69 @@ class Data extends CI_Model {
 					FROM filehistory z
 					WHERE z.fileid = b.fileid
 				)
-				WHERE month=? AND year=? AND clientid = ?
-				ORDER BY filedate DESC";
+			WHERE month=? AND year=? AND clientid = ? AND fileentity = ? AND filecategory=?";
+		$params = array($filemonth, $fileyear, $client, $entity, $filecategory);
+		return $this->db->query($q,$params)->result_array();
+	}
+	public function select_fileaudittrail($filemonth, $fileyear, $client, $entity)
+	{
+		$q = "SELECT trailstatus FROM fileaudittrail a
+			WHERE month=? AND year=? AND clientid = ? AND entity = ? ORDER BY updateddate DESC LIMIT 1";
+		$params = array($filemonth, $fileyear, $client, $entity);
+		return $this->db->query($q,$params)->row_array();
+	}
+	public function select_filereview($filemonth, $fileyear, $client, $entity)
+	{
+		if ($entity == "ALL"){
+			$entity = "";
+		}
+		if($_SESSION["position"] == "client"){
+			$q = "SELECT
+				a.*,
+				b.*,
+				'". $_SESSION["username"] ."' as username,
+				e.trailstatus,
+				e.updateddate
+			FROM filezone a
+			LEFT JOIN filehistory b ON a.fileid = b.fileid
+			AND b.filedate =
+				(
+					SELECT MAX(filedate)
+					FROM filehistory z
+					WHERE z.fileid = b.fileid
+				)
+			LEFT JOIN fileaudittrail e ON
+			a.year = e.year
+			AND a.month = e.month
+			AND a.clientid = e.clientid
+			AND a.fileentity = e.entity
+			AND e.updateddate =
+				(
+					SELECT MAX(updateddate)
+					FROM fileaudittrail x
+					WHERE x.year = e.year
+						AND x.month = e.month
+						AND x.clientid = e.clientid
+						AND x.entity = e.entity
+				)
+			WHERE a.month=? AND a.year=? AND a.clientid = ?
+			AND a.fileentity LIKE '%".$entity."%'
+			AND a.filecategory = 'btgfile'
+			ORDER BY a.fileEntity, b.filedate DESC";
 			$params = array($filemonth, $fileyear, $_SESSION["clientid"]);
 		}else{
 			if ($client == "ALL"){
 				$client = "%%";
-			}
-			if ($entity == "ALL"){
 				$entity = "";
 			}
-			$q = "SELECT a.*, b.*, c.username, d.clientname FROM filezone a
+			$q = "SELECT
+				a.*,
+				b.*,
+				c.username,
+				d.clientname,
+				e.trailstatus,
+				e.updateddate
+			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
 			AND b.filedate =
 				(
@@ -132,12 +230,126 @@ class Data extends CI_Model {
 					FROM filehistory z
 					WHERE z.fileid = b.fileid
 				)
-				LEFT JOIN useraccount c ON a.fileowner = c.username
-				LEFT JOIN clients d ON c.clientid = d.clientid
-				WHERE month=? AND year=?
-				AND c.clientid LIKE '".$client."'
-				AND a.fileentity LIKE '%".$entity."%'
-				ORDER BY filedate DESC";
+			LEFT JOIN fileaudittrail e ON
+			a.year = e.year
+			AND a.month = e.month
+			AND a.clientid = e.clientid
+			AND a.fileentity = e.entity
+			AND e.updateddate =
+				(
+					SELECT MAX(updateddate)
+					FROM fileaudittrail x
+					WHERE x.year = e.year
+						AND x.month = e.month
+						AND x.clientid = e.clientid
+						AND x.entity = e.entity
+				)
+			LEFT JOIN useraccount c ON
+			a.fileowner = c.username
+			LEFT JOIN clients d ON
+			a.clientid = d.clientid
+			WHERE a.month=? AND a.year=?
+			AND a.clientid LIKE '".$client."'
+			AND a.fileentity LIKE '%".$entity."%'
+			AND a.filecategory = 'btgfile'
+			AND a.clientid IN (".$_SESSION["clientaccess"].")
+			AND a.fileentity IN (".$_SESSION["entityaccess"].")
+			ORDER BY a.fileEntity, b.filedate DESC";
+			$params = array($filemonth, $fileyear);
+		}
+		return $this->db->query($q,$params)->result_array();
+	}
+	public function select_filezone($filemonth, $fileyear, $client, $entity)
+	{
+		if ($entity == "ALL"){
+			$entity = "";
+		}
+		if($_SESSION["position"] == "client"){
+			$q = "SELECT
+				a.*,
+				b.*,
+				'". $_SESSION["username"] ."' as username,
+				e.trailstatus,
+				CASE
+					WHEN filestatus = 'Approved' THEN 'green'
+					ELSE 'orange'
+				END AS filecolor
+			FROM filezone a
+			LEFT JOIN filehistory b ON a.fileid = b.fileid
+			AND b.filedate =
+				(
+					SELECT MAX(filedate)
+					FROM filehistory z
+					WHERE z.fileid = b.fileid
+				)
+			LEFT JOIN fileaudittrail e ON
+			a.year = e.year
+			AND a.month = e.month
+			AND a.clientid = e.clientid
+			AND a.fileentity = e.entity
+			AND e.updateddate =
+				(
+					SELECT MAX(updateddate)
+					FROM fileaudittrail x
+					WHERE x.year = e.year
+						AND x.month = e.month
+						AND x.clientid = e.clientid
+						AND x.entity = e.entity
+				)
+			WHERE a.month=? AND a.year=? AND a.clientid = ?
+			AND a.fileentity LIKE '%".$entity."%'
+			AND a.filecategory = 'clientfile'
+			ORDER BY a.fileEntity, b.filedate DESC";
+			$params = array($filemonth, $fileyear, $_SESSION["clientid"]);
+		}else{
+			if ($client == "ALL"){
+				$client = "%%";
+				$entity = "";
+			}
+			$q = "SELECT
+				a.*,
+				b.*,
+				c.username,
+				d.clientname,
+				e.trailstatus,
+				CASE
+					WHEN filestatus = 'Approved' THEN 'green'
+					ELSE 'orange'
+				END AS filecolor
+			FROM filezone a
+			LEFT JOIN filehistory b ON
+			a.fileid = b.fileid
+			AND b.filedate =
+				(
+					SELECT MAX(filedate)
+					FROM filehistory z
+					WHERE z.fileid = b.fileid
+				)
+            LEFT JOIN fileaudittrail e ON
+			a.year = e.year
+			AND a.month = e.month
+			AND a.clientid = e.clientid
+			AND a.fileentity = e.entity
+			AND e.updateddate =
+				(
+					SELECT MAX(updateddate)
+					FROM fileaudittrail x
+					WHERE x.year = e.year
+						AND x.month = e.month
+						AND x.clientid = e.clientid
+						AND x.entity = e.entity
+				)
+			LEFT JOIN useraccount c ON
+			a.fileowner = c.username
+			LEFT JOIN clients d ON
+			c.clientid = d.clientid
+			WHERE a.month=? AND a.year=?
+			AND c.clientid LIKE '".$client."'
+			AND a.fileentity LIKE '%".$entity."%'
+			AND a.filecategory = 'clientfile'
+			AND a.clientid IN (".$_SESSION["clientaccess"].")
+			AND a.fileentity IN (".$_SESSION["entityaccess"].")
+			ORDER BY a.fileEntity, filedate DESC";
 			$params = array($filemonth, $fileyear);
 		}
 		return $this->db->query($q,$params)->result_array();
@@ -162,7 +374,7 @@ class Data extends CI_Model {
 	}
 	public function get_client($clientid)
 	{
-		$q="SELECT * FROM clients WHERE clientid=?";
+		$q="SELECT * FROM clients WHERE clientid=? ";
 		$params = array($clientid);
 		return $this->db->query($q, $params)->row_array();
 	}
@@ -173,14 +385,39 @@ class Data extends CI_Model {
 	}
 	public function select_client()
 	{
+		$q = "SELECT clientid, clientname FROM clients WHERE active=1
+		AND clientid IN (".$_SESSION["clientaccess"].")";
+		return $this->db->query($q)->result_array();
+	}
+	public function select_client_all()
+	{
 		$q = "SELECT clientid, clientname FROM clients WHERE active=1";
 		return $this->db->query($q)->result_array();
 	}
-	public function select_entity($id)
+	public function select_entity_all($id)
 	{
 		$q = "SELECT d.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=d.value AND f.clientid=d.subcategory) AS filecount
 		FROM dropdown d WHERE category='client' AND subcategory=?";
 		$param = array($id);
+		return $this->db->query($q,$param)->result_array();
+	}
+	public function select_entity($id)
+	{
+		$access = "";
+		if($_SESSION["position"] != 'client'){
+			$access = " AND d.subcategory IN (".$_SESSION["clientaccess"].") AND d.value IN (".$_SESSION["entityaccess"].") ";
+		}
+		$q = "SELECT d.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=d.value AND f.clientid=d.subcategory) AS filecount
+		FROM dropdown d WHERE category='client' AND subcategory=?" . $access;
+		$param = array($id);
+		return $this->db->query($q,$param)->result_array();
+	}
+	public function select_entity_staff($month, $year, $clientid, $trailstatus)
+	{
+		$q = "SELECT a.entity AS name, a.entity AS value FROM fileaudittrail a WHERE month=? AND year=? AND clientid=? AND trailstatus=?
+			AND (SELECT COUNT(*) FROM fileaudittrail b WHERE month=? AND year=? AND clientid=? AND a.entity=b.entity  AND trailstatus='ConfirmedBAS') = 0
+			AND a.clientid IN (".$_SESSION["clientaccess"].") AND a.entity IN (".$_SESSION["entityaccess"].")";
+		$param = array($month, $year, $clientid, $trailstatus, $month, $year, $clientid);
 		return $this->db->query($q,$param)->result_array();
 	}
 	public function insert_account($username, $accountname, $email, $position, $clientid, $emailcode)
@@ -207,6 +444,24 @@ class Data extends CI_Model {
 		$params = array($clientid, $entity, $entity);
 		$this->db->query($q, $params);
 	}
+	public function insert_access($clientid, $entity, $username)
+	{
+		// if($clientid == 'ALL'){
+		// 	$clientid = '%%'
+		// }
+		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
+		$params = array($clientid, $entity, $username);
+		$this->db->query($q, $params);
+		$q = "INSERT INTO userentity(clientid, entity, username, active) VALUES(?,?,?,'1')";
+		$params = array($clientid, $entity, $username);
+		$this->db->query($q, $params);
+	}
+	public function delete_access($clientid, $entity, $username)
+	{
+		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
+		$params = array($clientid, $entity, $username);
+		$this->db->query($q, $params);
+	}
 	public function delete_entity($value, $subcategory)
 	{
 		$q = "DELETE FROM dropdown WHERE value=? AND subcategory=?";
@@ -230,20 +485,32 @@ class Data extends CI_Model {
 	}
 	public function insert_fileaudittrail($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 	{
-		$q = "INSERT INTO fileaudittrail(clientid, fileentity, month, year, updatedby, trailstatus, remarks) VALUES(?,?,?,?,?,?,?)";
+		$q = "INSERT INTO fileaudittrail(clientid, entity, month, year, updatedby, trailstatus, remarks, updateddate) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP())";
 		$params = array($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks);
 		$this->db->query($q, $params);
 	}
 	public function insert_file($filename, $filetype, $month, $year, $fileentity)
 	{
-		$q = "INSERT INTO filezone(filename, filetype, month, year, fileowner,fileentity,clientid) VALUES(?,?,?,?,?,?,?)";
+		$q = "INSERT INTO filezone(filename, filetype, month, year, fileowner,fileentity,clientid,filecategory) VALUES(?,?,?,?,?,?,?,'clientfile')";
 		$params = array($filename, $filetype, $month, $year,$_SESSION["username"], $fileentity, $_SESSION["clientid"]);
+		$this->db->query($q, $params);
+	}
+	public function insert_filereview($filename, $clientid, $month, $year, $fileentity)
+	{
+		$q = "INSERT INTO filezone(filename, month, year, fileowner,fileentity,clientid,filecategory) VALUES(?,?,?,?,?,?,'btgfile')";
+		$params = array($filename, $month, $year,$_SESSION["username"], $fileentity, $clientid);
 		$this->db->query($q, $params);
 	}
 	public function update_file($fileid, $filename, $filetype, $month, $year, $fileentity)
 	{
 		$q = "UPDATE filezone SET filename=?, filetype=?, month=?, year=?, fileentity=? WHERE fileid=?";
 		$params = array($filename, $filetype, $month, $year, $fileentity, $fileid);
+		$this->db->query($q, $params);
+	}
+	public function update_filereview($fileid, $filename, $clientid, $month, $year, $fileentity)
+	{
+		$q = "UPDATE filezone SET filename=?, clientid=?, month=?, year=?, fileentity=? WHERE fileid=?";
+		$params = array($filename, $clientid, $month, $year, $fileentity, $fileid);
 		$this->db->query($q, $params);
 	}
 	public function active_account($username, $active)

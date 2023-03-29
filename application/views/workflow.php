@@ -30,7 +30,7 @@
         </div>
         <!-- Page content -->
         <div class="container-fluid">
-            <iframe src="http://18.204.165.1:8503/" frameborder="0" height="1000px" width="100%"></iframe>
+            <iframe src="<?php echo $pageurl; ?>" frameborder="0" height="1000px" width="100%"></iframe>
         </div>
     </div>
     <?php require "js.php"; ?>

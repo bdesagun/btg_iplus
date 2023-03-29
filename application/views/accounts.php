@@ -63,6 +63,7 @@
                                         <option value="">Select Position</option>
                                         <option value="client">Client</option>
                                         <option value="staff">Staff</option>
+                                        <option value="reviewer">Reviewer</option>
                                         <option value="admin">Admin</option>
                                     </select>
                                     <div id='val_position'></div>
@@ -162,6 +163,51 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalAccess" tabindex="-1" role="dialog" aria-labelledby="accessLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="accessLabel">Access List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <select class="form-control" id="selectClientAccess" onchange="GetEntityAccess()"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <select class="form-control" id="selectEntityAccess"><option value='ALL'>ALL</option></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <button type="button" style="width:100%" class="btn btn-outline-default" onclick="addAccess()">Add Access</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <div class="table-responsive py-4"  id="div_access_table"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Page content -->
         <div class="container-fluid mt--6">
             <div class="row">
@@ -189,10 +235,49 @@
     var useremail;
     loadAccount();
     GetClient();
+    GetClientAccess();
+    GetEntityAccess();
     function loadAccount(){
         $("#div_account_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         $.post("select_account_list").done(function(data) {
             $("#div_account_table").html(data);
+        });
+    }
+    function loadAccess(id){
+        $("#selectClientAccess").val('ALL');
+        $("#selectEntityAccess").val('ALL');
+        userid = id;
+        var params;
+        params = {
+            username    : userid,
+        };
+        $("#div_access_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        $.post("select_access_list",params).done(function(data) {
+            $("#div_access_table").html(data);
+        });
+    }
+    function addAccess(){
+        console.log(userid);
+        var params;
+        params = {
+            clientid    : $("#selectClientAccess").val(),
+            entity      : $("#selectEntityAccess").val(),
+            username    : userid,
+        };
+        $.post("insert_access",params).done(function(data) {
+            loadAccess(userid);
+        });
+    }
+    function deleteAccess(userclient, userentity, useraccess){
+        var params;
+        params = {
+            clientid    : userclient,
+            entity      : userentity,
+            username    : useraccess,
+        };
+        console.log(params);
+        $.post("delete_access",params).done(function(data) {
+            loadAccess(useraccess);
         });
     }
     function GetClient(){
@@ -204,6 +289,35 @@
             $("#clientname").html(data);
             $("#clientname").prop('disabled', false);
         });
+    }
+    function GetClientAccess(){
+        $("#selectEntityAccess").val('ALL');
+        $("#selectEntityAccess").prop('disabled', true);
+        $("#selectClientAccess").prop('disabled', true);
+        $('#selectClientAccess')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_client").done(function(data) {
+            $("#selectClientAccess").html(data);
+            $("#selectClientAccess").prop('disabled', false);
+        });
+    }
+    function GetEntityAccess(){
+        if($('#selectClientAccess').val() == 'ALL' || $('#selectClientAccess').val() == 'LOADING...'){
+            $("#selectEntityAccess").val('ALL');
+            $("#selectEntityAccess").prop('disabled', true);
+        }
+        else{
+            $("#selectEntityAccess").prop('disabled', true);
+            $('#selectEntityAccess')
+                .empty()
+                .append('<option value="">LOADING...</option>');
+            $.post("select_entity", { id: $('#selectClientAccess').val() }, function(data) {
+                //console.log(data);
+                $("#selectEntityAccess").html(data);
+                $("#selectEntityAccess").prop('disabled', false);
+            });
+        }
     }
     function showClient(){
         $("#clientname").val("");
