@@ -255,6 +255,16 @@ class Page extends CI_Controller
 		}
 		echo $option;
 	}
+	function select_client_all()
+	{
+		$option = "";
+		$res = $this->data->select_client_all();
+		$option .= "<option value='ALL'>ALL</option>";
+		foreach ($res as $v) {
+			$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
+		}
+		echo $option;
+	}
 	function select_clientname()
 	{
 		$option = "";
@@ -281,6 +291,19 @@ class Page extends CI_Controller
 		}else{
 			$option .= "<option value=''>Select Entity</option>";
 		}
+		foreach ($res as $v) {
+			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
+		}
+		echo $option;
+	}
+
+	function select_entity_all()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $post["id"];
+		$option = "";
+		$res = $this->data->select_entity_all($client);
+		$option .= "<option value='ALL'>ALL</option>";
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
 		}
@@ -363,7 +386,7 @@ class Page extends CI_Controller
 			$post["email"],
 			$post["position"],
 			$post["username"],
-			$post["clientname"]
+			$post["clientid"]
 		);
 	}
 	function insert_client()

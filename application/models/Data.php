@@ -428,7 +428,7 @@ class Data extends CI_Model {
 	}
 	public function update_account($accountname, $email, $position, $username, $clientname)
 	{
-		$q = "UPDATE useraccount SET accountname=?, email=?, position=?, clientname=? WHERE username=?";
+		$q = "UPDATE useraccount SET accountname=?, email=?, position=?, clientid=? WHERE username=?";
 		$params = array($accountname, $email, $position, $clientname, $username);
 		$this->db->query($q, $params);
 	}
@@ -446,14 +446,19 @@ class Data extends CI_Model {
 	}
 	public function insert_access($clientid, $entity, $username)
 	{
-		// if($clientid == 'ALL'){
-		// 	$clientid = '%%'
-		// }
+		if($clientid == 'ALL'){
+			$clientid = '%%';
+		}
+		if($entity == 'ALL'){
+			$entity = '%%';
+		}
 		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
 		$params = array($clientid, $entity, $username);
 		$this->db->query($q, $params);
-		$q = "INSERT INTO userentity(clientid, entity, username, active) VALUES(?,?,?,'1')";
-		$params = array($clientid, $entity, $username);
+		$q = "INSERT INTO userentity(clientid, entity, username, active)
+			SELECT a.clientid, b.value, ? AS username, '1' AS active FROM clients a LEFT JOIN dropdown b ON a.clientid=b.subcategory
+			WHERE a.clientid LIKE ? AND b.value LIKE ?";
+		$params = array($username, $clientid, $entity);
 		$this->db->query($q, $params);
 	}
 	public function delete_access($clientid, $entity, $username)

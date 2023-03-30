@@ -297,7 +297,7 @@
         $('#selectClientAccess')
             .empty()
             .append('<option>LOADING...</option>');
-        $.post("select_client").done(function(data) {
+        $.post("select_client_all").done(function(data) {
             $("#selectClientAccess").html(data);
             $("#selectClientAccess").prop('disabled', false);
         });
@@ -312,7 +312,7 @@
             $('#selectEntityAccess')
                 .empty()
                 .append('<option value="">LOADING...</option>');
-            $.post("select_entity", { id: $('#selectClientAccess').val() }, function(data) {
+            $.post("select_entity_all", { id: $('#selectClientAccess').val() }, function(data) {
                 //console.log(data);
                 $("#selectEntityAccess").html(data);
                 $("#selectEntityAccess").prop('disabled', false);
@@ -329,6 +329,7 @@
     }
     function testAccount(){
         var numVal = 0;
+        var saveStatus = document.getElementById('accountLabel').innerHTML;
         if($("#accountname").val() == ''){
             $("#val_accountname").empty().append("<label style='color:red; font-style:italic;'>Please input an account name</label>");
             numVal += 1;
@@ -347,28 +348,32 @@
                 numVal += 1;
             }
         }
-        if($("#username").val() == ''){
-            $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Please input a username</label>");
-            numVal += 1;
-            return numVal;
-        }else{
-            if($("#username").val().length < 8){
-                $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username must be at least 8 characters.</label>");
+        if(saveStatus == 'New Account'){
+            if($("#username").val() == ''){
+                $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Please input a username</label>");
                 numVal += 1;
-            }
-            var params;
-            params = {
-                username    : $("#username").val(),
-            };
-            $.post("select_username", params).done(function(data) {
-                if (data == 'existing'){
-                    $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username already exists.</label>");
+                return numVal;
+            }else{
+                if($("#username").val().length < 8){
+                    $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username must be at least 8 characters.</label>");
                     numVal += 1;
-                    saveAccount(numVal);
-                }else{
-                    saveAccount(numVal);
                 }
-            });
+                var params;
+                params = {
+                    username    : $("#username").val(),
+                };
+                $.post("select_username", params).done(function(data) {
+                    if (data == 'existing'){
+                        $("#val_username").empty().append("<label style='color:red; font-style:italic;'>Username already exists.</label>");
+                        numVal += 1;
+                        saveAccount(numVal);
+                    }else{
+                        saveAccount(numVal);
+                    }
+                });
+            }
+        }else{
+            saveAccount(numVal);
         }
     }
     $('#accountname').on('input', function() {
@@ -406,6 +411,7 @@
                     loadAccount();
                 });
             }else{
+                console.log($("#username").val());
                 $.post("update_account",params).done(function(data) {
                     swal("Saved!", "Account successfully updated!", "success");
                     $('#modalAccount').modal('toggle');
@@ -481,12 +487,12 @@
             $("#accountname").val(useraccount.accountname);
             $("#email").val(useraccount.email);
             $("#position").val(useraccount.position);
-            $("#clientname").val(useraccount.clientname);
             if (useraccount.position == "client") {
                 $("#clientrow").show();
             }else{
                 $("#clientrow").hide();
             }
+            $("#clientname").val(useraccount.clientid);
         });
     }
     function clearAccount(){
