@@ -268,7 +268,7 @@ class Page extends CI_Controller
 	function select_clientname()
 	{
 		$option = "";
-		$res = $this->data->select_client();
+		$res = $this->data->select_client_all();
 		$option .= "<option value=''>Select Client</option>";
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
