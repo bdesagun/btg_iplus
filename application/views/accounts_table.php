@@ -31,6 +31,9 @@
                                 <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalActivation" onclick="viewActivationAccount('<?php echo $row['active']; ?>','<?php echo $row['username']; ?>')">Activate</button>
                             <?php } ?>
                         <?php } ?>
+                        <?php if($row['Position'] != "client" && $row['Position'] != "admin"){ ?>
+                            <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalAccess" onclick="loadAccess('<?php echo $row['username']; ?>')">Access</button>
+                        <?php } ?>
                     </td>
                 </tr>
         <?php } ?>

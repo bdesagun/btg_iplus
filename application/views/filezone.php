@@ -20,12 +20,12 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="filezoneLabel">Upload File</h5>
+                        <h5 class="modal-title" id="filezoneLabel">Upload Client File</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                `    <div class="modal-body">
+                    <div class="modal-body">
                         <div class="row">
                             <div class="col-3">
                                 <div class="form-group">
@@ -86,6 +86,76 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalFilereview" tabindex="-1" role="dialog" aria-labelledby="filereviewLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filereviewLabel">Upload BTG File</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label class="form-control-label">File Name:</label>
+                                </div>
+                            </div>
+                            <div class="col-7">
+                                <div class="form-group">
+                                    <label class="form-control-label" id="fileNameReview"></label>
+                                    <div id='val_fileNameReview'></div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFileR">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Client</label>
+                                    <select class="form-control" id="selectClientReview" onchange="GetEntityReview('', 'Confirmed')"></select>
+                                    <div id='val_selectClientReview'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Entity</label>
+                                    <select class="form-control" id="selectEntityReview"></select>
+                                    <div id='val_selectEntityReview'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Month</label>
+                                    <select class="form-control" id="selectMonthReview"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Year</label>
+                                    <select class="form-control" id="selectYearReview"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-default" onclick="saveFileReview()">Save</button>
+                        <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="modalFile" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -127,6 +197,48 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalFileR" tabindex="-1" role="dialog" aria-labelledby="fileRLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="fileRLabel">Choose File</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <form id="form_upload_review" enctype="multipart/form-data">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <input type="file" id="file_to_upload_review" name="file_to_upload_review" class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-outline-default" id="upload_btn" data-dismiss="modal">Ok</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <h5><i>Note: Only xlsx, xls and cvs files are allowed.</i></h5>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="modalHistory" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -159,46 +271,201 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="filezoneLabel">File Confirmation</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label class="form-control-label">This is to confirm that your uploaded files are complete and ready.</label>
-                                    <select class="form-control" id="selectEntity3" onchange="loadFilesList()"></select>
+        <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+            <div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">File Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">This is to confirm that your uploaded files are complete and ready.</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label class="form-control-label">Files:</label>
-                                    <div class="table-responsive py-4"  id="div_filelist_table"></div>
-                                    <div id='val_selectEntity3'></div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectEntity3" onchange="loadFilesList('clientfile')"></select>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Confirm</button>
-                                    <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="table-responsive py-4"  id="div_filelist_table"></div>
+                                        <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="confirmButton" onclick="auditFile('Confirmed')">Confirm</button>
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="modal fade" id="modalConfirmBAS" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">BAS File Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">This is to confirm that the uploaded BAS files are all correct.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectEntityBas" onchange="loadFilesListFinal('btgfile')"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="table-responsive py-4"  id="div_filebas_table"></div>
+                                        <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="confirmButtonBas" onclick="auditFile('ConfirmedBAS')">Confirm</button>
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
+            <div class="modal fade" id="modalForReview" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">File Approval</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">This is to approve that the BAS files are all reviewed.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectClient2" onchange="GetEntity4('Approved')"><option value=''>Select Entity</option></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectEntity3" onchange="loadFilesList('btgfile')"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="table-responsive py-4"  id="div_filelist_table"></div>
+                                        <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="confirmButton" onclick="auditFile('Reviewed')">Approve</button>
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
         <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+            <div class="modal fade" id="modalForApprove" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">BAS File Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">This is to connfirm that the BAS files are all uploaded and ready for review.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectClient2" onchange="GetEntity4('Confirmed')"><option value=''>Select Entity</option></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectEntity3" onchange="loadFilesList('btgfile')"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="table-responsive py-4"  id="div_filelist_table"></div>
+                                        <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="confirmButton" onclick="auditFile('Approved')">Confirm</button>
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="modal fade" id="modalApprove" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
                 <div class="modal-dialog modal-sm" role="document">
                     <div class="modal-content">
@@ -288,28 +555,23 @@
                 <div class="col">
                     <div class="card">
                         <!-- Card header -->
-                        <div class="card-header">
+                        <div class="card-body">
                             <div class="row">
-                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
-                                    <div class="col-md-1">
-                                        <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilezone" onclick="newFile()">Upload</button></h3>
-                                    </div>
-                                <?php } ?>
-                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
                                     <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
                                     <div class="col-md-2">
                                         <select class="form-control" id="selectClient" onchange="loadFiles(), GetEntity2()"></select>
                                     </div>
-                                    <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Entity:</label>
-                                    <div class="col-md-2">
-                                        <select class="form-control" id="selectEntity2" onchange="loadFiles()"><option value='ALL'>ALL</option></select>
-                                    </div>
                                 <?php } ?>
-                                <?php if($_SESSION["position"] == "staff" && $_SESSION["position"] != "admin"){ ?>
-                                    <div class="col-md-2"></div>
-                                <?php } ?>
+                                <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Entity:</label>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="selectEntity2" onchange="loadFiles()"><option value='ALL'>ALL</option></select>
+                                </div>
                                 <?php if($_SESSION["position"] == "client" && $_SESSION["position"] != "admin"){ ?>
                                     <div class="col-md-5"></div>
+                                <?php } ?>
+                                <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer") && $_SESSION["position"] != "admin"){ ?>
+                                    <div class="col-md-2"></div>
                                 <?php } ?>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadFiles()"></select>
@@ -317,14 +579,115 @@
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectYear" onchange="loadFiles()"></select>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <!-- Card header -->
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h3 class="mb-0">Client Files</h3>
+                                </div>
                                 <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
                                     <div class="col-md-2 text-right">
-                                        <h3 class="mb-0"><button type="button" class="btn btn-outline-default" data-toggle="modal" data-target="#modalConfirm" onclick="GetEntity3()">Confirm File</button></h3>
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilezone" onclick="newFile()">Upload</button></h3>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalConfirm" onclick="GetEntity3()">Confirm Files</button></h3>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                            <div class="row">
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Upload your files using "Upload" button then confirm using "Confirm Files" button if you files are complete and ready for BAS Preperation.</b>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Download BAS Files by clicking the name of the file then "Approve" or "Return" the file individually base on your assessment</b>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Download Files by clicking the name of the file</b>
+                                        </p>
                                     </div>
                                 <?php } ?>
                             </div>
                         </div>
                         <div class="table-responsive py-4"  id="div_filezone_table"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <!-- Card header -->
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h3 class="mb-0">BTG Staff Files</h3>
+                                </div>
+                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilereview" onclick="newFileReview()">Upload BAS Files</button></h3>
+                                    </div>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForApprove" onclick="GetClient2(), GetEntity4('')">Confirm BAS Files</button></h3>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2 text-right"></div>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReview" onclick="GetClient2(), GetEntity4('')">Approve BAS Files</button></h3>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-2 text-right"></div>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalConfirmBAS" onclick="GetEntityBas()">Confirm BAS Files</button></h3>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                            <div class="row">
+                                <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Download BAS Files by clicking the name of the file then confirm by using "Confirm BAS Files" button if the BAS files are ready for lodge.</b>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Upload your files using "Upload BAS Files" button then confirm using "Confirm BAS Files" button if you files are complete and ready for BAS Reviewer.</b>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                                <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
+                                    <div class="col-md-12">
+                                        <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
+                                            <b>Download BAS Files by clicking the name of the file then approve by using "Approve BAS Files" button to return to the client for confirmation.</b>
+                                        </p>
+                                    </div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                        <div class="table-responsive py-4"  id="div_filereview_table"></div>
                     </div>
                 </div>
             </div>
@@ -338,8 +701,14 @@
     GetYear();
     GetMonth2();
     GetYear2();
+    GetMonthReview();
+    GetYearReview();
     GetClient();
+    GetClientReview();
     GetFileType();
+    GetEntity();
+    GetEntity2();
+    GetEntityReview('','');
     loadFiles();
     function loadFiles(){
         $("#div_filezone_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
@@ -352,16 +721,34 @@
         $.post("select_filezone", params).done(function(data) {
             $("#div_filezone_table").html(data);
         });
+        $.post("select_filereview", params).done(function(data) {
+            $("#div_filereview_table").html(data);
+        });
     }
-    function loadFilesList(){
+    function loadFilesList(filecateg){
         $("#div_filelist_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         params = {
-            filemonth   : $("#selectMonth").val(),
-            fileyear    : $("#selectYear").val(),
-            entity      : $("#selectEntity3").val(),
+            clientid        : $("#selectClient2").val(),
+            filemonth       : $("#selectMonth").val(),
+            fileyear        : $("#selectYear").val(),
+            entity          : $("#selectEntity3").val(),
+            filecategory    : filecateg,
         };
         $.post("select_filelist", params).done(function(data) {
             $("#div_filelist_table").html(data);
+        });
+    }
+    function loadFilesListFinal(filecateg){
+        $("#div_filebas_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            clientid        : $("#selectClient2").val(),
+            filemonth       : $("#selectMonth").val(),
+            fileyear        : $("#selectYear").val(),
+            entity          : $("#selectEntityBas").val(),
+            filecategory    : filecateg,
+        };
+        $.post("select_filelist", params).done(function(data) {
+            $("#div_filebas_table").html(data);
         });
     }
     function GetMonth(){
@@ -404,6 +791,26 @@
             $("#selectYear2").prop('disabled', false);
         });
     }
+    function GetMonthReview(){
+        $("#selectMonthReview").prop('disabled', true);
+        $('#selectMonthReview')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_month").done(function(data) {
+            $("#selectMonthReview").html(data);
+            $("#selectMonthReview").prop('disabled', false);
+        });
+    }
+    function GetYearReview(){
+        $("#selectYearReview").prop('disabled', true);
+        $('#selectYearReview')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_year").done(function(data) {
+            $("#selectYearReview").html(data);
+            $("#selectYearReview").prop('disabled', false);
+        });
+    }
     function GetFileType(){
         $("#selectType").prop('disabled', true);
         $('#selectType')
@@ -418,22 +825,75 @@
         $("#selectEntity").prop('disabled', true);
         $('#selectEntity')
             .empty()
-            .append('<option value="a">LOADING...</option>');
+            .append('<option value="">LOADING...</option>');
         $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+            //console.log(data);
             $("#selectEntity").html(data);
             $("#selectEntity").prop('disabled', false);
         });
     }
     function GetEntity3(){
+        $("#confirmButton").prop('disabled', true);
         $("#selectEntity3").prop('disabled', true);
         $('#selectEntity3')
             .empty()
-            .append('<option value="a">LOADING...</option>');
+            .append('<option value="">LOADING...</option>');
         $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
             $("#selectEntity3").html(data);
             $("#selectEntity3").prop('disabled', false);
         });
         $("#div_filelist_table").empty();
+    }
+    function GetEntityBas(){
+        $("#confirmButtonBas").prop('disabled', true);
+        $("#selectEntityBas").prop('disabled', true);
+        $('#selectEntityBas')
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+            $("#selectEntityBas").html(data);
+            $("#selectEntityBas").prop('disabled', false);
+        });
+        $("#div_filebas_table").empty();
+    }
+    function GetEntity4(tstatus){
+        $("#confirmButton").prop('disabled', true);
+        $("#selectEntity3").prop('disabled', true);
+        $('#selectEntity3')
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        var params;
+        params = {
+            fileMonth   : $("#selectMonth").val(),
+            fileYear    : $("#selectYear").val(),
+            clientid    : $("#selectClient2").val(),
+            trailstatus : tstatus,
+        };
+        $.post("select_entity_staff", params , function(data) {
+            $("#selectEntity3").html(data);
+            $("#selectEntity3").prop('disabled', false);
+        });
+        $("#div_filelist_table").empty();
+    }
+    function GetEntityReview(entityName, tstatus){
+        $("#selectEntityReview").prop('disabled', true);
+        $('#selectEntityReview')
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        var params;
+        params = {
+            fileMonth   : $("#selectMonthReview").val(),
+            fileYear    : $("#selectYearReview").val(),
+            clientid    : $("#selectClientReview").val(),
+            trailstatus : tstatus,
+        };
+        $.post("select_entity_staff", params , function(data) {
+            $("#selectEntityReview").html(data);
+            $("#selectEntityReview").prop('disabled', false);
+            if(entityName != ""){
+                $("#selectEntityReview").val(entityName);
+            }
+        });
     }
     function GetEntity2(){
         if($('#selectClient').val() == 'ALL' || $('#selectClient').val() == 'LOADING...'){
@@ -444,17 +904,19 @@
             $("#selectEntity2").prop('disabled', true);
             $('#selectEntity2')
                 .empty()
-                .append('<option value="a">LOADING...</option>');
+                .append('<option value="">LOADING...</option>');
             $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
-                console.log(data);
+                //console.log(data);
                 $("#selectEntity2").html(data);
                 $("#selectEntity2").prop('disabled', false);
             });
         }
     }
     function GetClient(){
-        $("#selectEntity2").val('ALL');
-        $("#selectEntity2").prop('disabled', true);
+        <?php if($_SESSION["position"] == "staff" && $_SESSION["position"] != "admin"){ ?>
+            $("#selectEntity2").val('ALL');
+            $("#selectEntity2").prop('disabled', true);
+        <?php } ?>
         $("#selectClient").prop('disabled', true);
         $('#selectClient')
             .empty()
@@ -464,10 +926,30 @@
             $("#selectClient").prop('disabled', false);
         });
     }
+    function GetClient2(){
+        $("#selectEntity3").prop('disabled', true);
+        $("#selectClient2").prop('disabled', true);
+        $('#selectClient2')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_clientname").done(function(data) {
+            $("#selectClient2").html(data);
+            $("#selectClient2").prop('disabled', false);
+        });
+    }
+    function GetClientReview(){
+        $("#selectEntityReview").prop('disabled', true);
+        $("#selectClientReview").prop('disabled', true);
+        $('#selectClientReview')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_clientname").done(function(data) {
+            $("#selectClientReview").html(data);
+            $("#selectClientReview").prop('disabled', false);
+        });
+    }
     function newFile(){
         clearFile();
-        GetMonth2();
-        GetYear2();
         document.getElementById('filezoneLabel').innerHTML = 'Upload File';
     }
     function editFile(id){
@@ -486,37 +968,46 @@
             $("#selectEntity").val(filezone.fileentity);
         });
     }
+    function newFileReview(){
+        clearFileReview();
+        document.getElementById('filereviewLabel').innerHTML = 'Upload BTG File';
+    }
+    function editFileReview(id){
+        clearFileReview();
+        document.getElementById('filereviewLabel').innerHTML = 'Modify Uploaded BTG File';
+        params = {
+            fileid : id
+        };
+        $.post("get_filezone",params).done(function(data) {
+            var filezone = JSON.parse(data);
+            file_id = filezone.fileid;
+            $("#fileNameReview").text(filezone.filename);
+            $("#selectMonthReview").val(filezone.month);
+            $("#selectYearReview").val(filezone.year);
+            $("#selectClientReview").val(filezone.clientid);
+            GetEntityReview(filezone.fileentity,'Approved');
+        });
+    }
     function deleteFile(id){
-        let text = "Are you sure you want to delete this file? File cannot be recovered.";
-        if (confirm(text) == true) {
-            params = {
-                fileid : id
-            };
-            $.post("delete_file",params).done(function(data) {
-                swal("Deleted!", "File successfully deleted!");
-                loadFiles();
-            });
-        }
-        // params = {
-        //     fileid : id
-        // };
-        // swal({
-        //     title: "Are you sure you want to delete this file?",
-        //     text: "You will not be able to recover this file!",
-        //     type: "warning",
-        //     showCancelButton: true,
-        //     confirmButtonColor: "#DD6B55",
-        //     confirmButtonText: "Yes",
-        //     cancelButtonText: "No"
-        // }, function (isConfirm) {
-        //     alert("dumaan");
-        //     if (isConfirm) {
-        //         $.post("delete_file",params).done(function(data) {
-        //             swal("Deleted!", "Your file has been deleted.", "success");
-        //             loadFiles();
-        //         });
-        //     }
-        // });
+        swal({
+            title: "Are you sure you want to delete this file?",
+            text: "File cannot be recovered.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, delete it!"
+        })
+        .then((willDelete) => {
+            if(willDelete.value){
+                params = {
+                    fileid : id
+                };
+                $.post("delete_file",params).done(function(data) {
+                    swal("Deleted!", "File successfully deleted!");
+                    loadFiles();
+                });
+            }
+        });
     }
     function historyFile(id){
         $("#div_history_file").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
@@ -544,6 +1035,15 @@
         $("#val_selectEntity").empty();
         $("#val_fileName").empty();
     }
+    function clearFileReview(){
+        $("#fileNameReview").text("");
+        $("#file_to_upload_review").val("");
+        $("#selectEntityReview").val("");
+        $("#selectClientReview").val("");
+        $("#val_selectClientReview").empty();
+        $("#val_selectEntityReview").empty();
+        $("#val_fileNameReview").empty();
+    }
     function notifTest(){
         swal("Saved!", $("#file_to_upload").val(), "success");
         //showBasicMassage();
@@ -569,6 +1069,28 @@
     });
     $('#selectEntity').on('change', function() {
         $("#val_selectEntity").empty();
+    });
+    function testFileReview(){
+        var numVal = 0;
+        if($("#selectClientReview").val() == ''){
+            $("#val_selectClientReview").empty().append("<label style='color:red; font-style:italic;'>Please select a client</label>");
+            numVal += 1;
+        }
+        if($("#selectEntityReview").val() == ''){
+            $("#val_selectEntityReview").empty().append("<label style='color:red; font-style:italic;'>Please select an entity</label>");
+            numVal += 1;
+        }
+        if($("#fileNameReview").text() == ''){
+            $("#val_fileNameReview").empty().append("<label style='color:red; font-style:italic;'>Please choose a file</label>");
+            numVal += 1;
+        }
+        return numVal;
+    }
+    $('#selectClientReview').on('change', function() {
+        $("#val_selectClientReview").empty();
+    });
+    $('#selectEntityReview').on('change', function() {
+        $("#val_selectEntityReview").empty();
     });
     function saveFile(){
         if (testFile() == 0){
@@ -602,6 +1124,64 @@
                 });
             }
         }
+    }
+    function saveFileReview(){
+        if (testFileReview() == 0){
+            var saveStatus = document.getElementById('filereviewLabel').innerHTML;
+            var params;
+            params = {
+                fileid     : file_id,
+                fileName    : $("#fileNameReview").text(),
+                fileMonth   : $("#selectMonthReview").val(),
+                fileYear    : $("#selectYearReview").val(),
+                clientid    : $("#selectClientReview").val(),
+                fileEntity  : $("#selectEntityReview").val(),
+            };
+            if(saveStatus == 'Upload BTG File'){
+                $.post("insert_filereview",params).done(function(data) {
+                    swal("Saved!", "BGT File successfully submitted!", "success");
+                    $('#modalFilereview').modal('toggle');
+                    if ($("#file_to_upload_review").val() != ""){
+                        saveToFolderReview($("#selectEntityReview").val(),$("#selectClientReview").val());
+                    }
+                    loadFiles();
+                });
+            }else{
+                $.post("update_filereview",params).done(function(data) {
+                    swal("Saved!", "BGT File successfully updated!", "success");
+                    $('#modalFilereview').modal('toggle');
+                    if ($("#file_to_upload_review").val() != ""){
+                        saveToFolder($("#selectEntityReview").val());
+                    }
+                    loadFiles();
+                });
+            }
+        }
+    }
+    function auditFile(status){
+        var filentitybas;
+        if(status != 'ConfirmedBAS'){
+            filentitybas = $("#selectEntity3").val();
+        }else{
+            filentitybas = $("#selectEntityBas").val();
+        }
+        var params;
+        params = {
+            fileMonth   : $("#selectMonth").val(),
+            fileYear    : $("#selectYear").val(),
+            clientid    : $("#selectClient2").val(),
+            fileEntity  : filentitybas,
+            trailstatus : status,
+        };
+        $.post("insert_fileaudittrail",params).done(function(data) {
+            swal("Saved!", "File successfully " + status + "!", "success");
+            // if(status != 'ConfirmedBAS'){
+            //     $('#modalConfirm').modal('toggle');
+            // }else{
+            //     $('#modalConfirmBAS').modal('toggle');
+            // }
+            loadFiles();
+        });
     }
     function getFileID(id){
         $("#fileReason").val("");
@@ -639,10 +1219,27 @@
         }
         });
     }
+    function saveToFolderReview(entity,clientid){
+        var formEl = document.forms.form_upload_review;
+        $.ajax({
+            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity + '&clientid=' + clientid,
+            type:"post",
+            data:new FormData(formEl),
+            processData:false,
+            contentType:false,
+            cache:false,
+            async:false,
+            success: function(data){
+                console.log("Upload Image Successful.");
+        }
+        });
+    }
     $('input[type="file"]').change(function(e){
         var fileName = e.target.files[0].name;
         $("#fileName").text(fileName);
+        $("#fileNameReview").text(fileName);
         $("#val_fileName").empty();
+        $("#val_fileNameReview").empty();
     });
 </script>
 </html>
