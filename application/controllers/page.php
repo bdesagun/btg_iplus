@@ -97,6 +97,9 @@ class Page extends CI_Controller
 			echo 'available';
 		}
 	}
+	function select_home(){
+		$this->load->view("home_table");
+	}
 	function select_account_list()
 	{
 		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {

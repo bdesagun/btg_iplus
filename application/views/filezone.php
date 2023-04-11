@@ -616,7 +616,7 @@
                                 <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
                                     <div class="col-md-12">
                                         <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0;">
-                                            <b>Download BAS Files by clicking the name of the file then "Approve" or "Return" the file individually base on your assessment</b>
+                                            <b>Download Files by clicking the name of the file then "Approve" or "Return" the file individually base on your assessment</b>
                                         </p>
                                     </div>
                                 <?php } ?>

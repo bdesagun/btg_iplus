@@ -13,5 +13,6 @@
 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/vendor/quill/dist/quill.core.css">
 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/vendor/animate.css/animate.min.css">
 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/vendor/sweetalert2/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/vendor/fullcalendar/dist/fullcalendar.min.css">
 <!-- Argon CSS -->
 <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/argon.css?v=1.1.0" type="text/css">
