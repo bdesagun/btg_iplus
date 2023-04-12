@@ -34,12 +34,12 @@
                             <span class="nav-link-text">Dashboards</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="workflow"  style="<?php echo ($_SESSION["activepage"] == "WORKFLOW") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
                             <i class="ni ni-single-copy-04 text-black"></i>
                             <span class="nav-link-text">Workflow</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="#navbar-history" data-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="navbar-history">

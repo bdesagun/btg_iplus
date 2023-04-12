@@ -41,7 +41,7 @@ class Page extends CI_Controller
 	}
 	function accounts()
 	{
-		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+		if ($_SESSION["position"] == "admin") {
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("accounts");
 		}else{
@@ -50,7 +50,7 @@ class Page extends CI_Controller
 	}
 	function clients()
 	{
-		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+		if ($_SESSION["position"] == "admin") {
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("clients");
 		}else{
@@ -326,7 +326,7 @@ class Page extends CI_Controller
 	function select_entity_list()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$data["entity"] = $this->data->select_entity($post["clientid"]);
+		$data["entity"] = $this->data->select_entity_all($post["clientid"]);
 		$this->load->view("maintenance/entity_table", $data);
 	}
 	function select_access_list()
@@ -354,11 +354,14 @@ class Page extends CI_Controller
 	function insert_account(){
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
 		$emailcode = substr(str_shuffle($permitted_chars), 0, 30);
+		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
 		$post = $this->security->xss_clean($this->input->post());
         $to = $post["email"];
-        $subject = 'BTGI Plus Email Verification';
+        $subject = 'BTGI Plus Account Reset Password';
 		$data["emailcode"] = $emailcode;
-        $message = $this->load->view('mail_template/email_verification',$data,true);
+		$data["username"] = $post["username"];
+		$data["password"] = $genpassword;
+        $message = $this->load->view('mail_template/reset_password_template',$data,true);
         $from = $this->config->item('smtp_user');
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_account(
@@ -369,6 +372,32 @@ class Page extends CI_Controller
 			$post["clientid"],
 			$data["emailcode"]
 		);
+		$this->data->reset_account($post["username"], $genpassword);
+        $this->email->set_newline("\r\n");
+        $this->email->from($from);
+        $this->email->to($to);
+        $this->email->subject($subject);
+        $this->email->message($message);
+
+        if ($this->email->send()) {
+            echo 'Your Email has successfully been sent.';
+        } else {
+            show_error($this->email->print_debugger());
+        }
+	}
+	function reset_account()
+	{
+		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
+		$post = $this->security->xss_clean($this->input->post());
+        $to = $post["email"];
+        $subject = 'BTGI Plus Account Reset Password';
+		$data["username"] = $post["username"];
+		$data["password"] = $genpassword;
+        $message = $this->load->view('mail_template/reset_password_template',$data,true);
+        $from = $this->config->item('smtp_user');
+		$this->data->reset_account($post["username"], $genpassword);
+
         $this->email->set_newline("\r\n");
         $this->email->from($from);
         $this->email->to($to);
@@ -630,31 +659,6 @@ class Page extends CI_Controller
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->active_client($post["clientid"], $post["active"]);
-	}
-	function reset_account()
-	{
-		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
-		$post = $this->security->xss_clean($this->input->post());
-        $to = $post["email"];
-        $subject = 'BTGI Plus Account Reset Password';
-		$data["username"] = $post["username"];
-		$data["password"] = $genpassword;
-        $message = $this->load->view('mail_template/reset_password_template',$data,true);
-        $from = $this->config->item('smtp_user');
-		$this->data->reset_account($post["username"], $genpassword);
-
-        $this->email->set_newline("\r\n");
-        $this->email->from($from);
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-
-        if ($this->email->send()) {
-            echo 'Your Email has successfully been sent.';
-        } else {
-            show_error($this->email->print_debugger());
-        }
 	}
 	function upload_file()
 	{

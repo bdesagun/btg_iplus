@@ -452,7 +452,7 @@ class Data extends CI_Model {
 		if($entity == 'ALL'){
 			$entity = '%%';
 		}
-		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
+		$q = "DELETE FROM userentity WHERE clientid LIKE ? AND entity LIKE ? AND username=?";
 		$params = array($clientid, $entity, $username);
 		$this->db->query($q, $params);
 		$q = "INSERT INTO userentity(clientid, entity, username, active)
