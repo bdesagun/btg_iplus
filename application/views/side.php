@@ -72,6 +72,36 @@
                             <span class="nav-link-text">FAQ</span>
                         </a>
                     </li>
+                    <?php if($_SESSION["position"] != "client"){ ?>
+                    <li class="nav-item">
+                        <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
+                        <div class="col-md-12">
+                            <select class="form-control" id="selectClientGlobal" onchange="goto()"></select>
+                            <script src="<?php echo base_url(); ?>assets/vendor/jquery/dist/jquery.min.js"></script>
+                            <script type="text/javascript">
+                                getCurrentClient();
+                                function goto(){
+                                    params = {
+                                        clientGLobal : $("#selectClientGlobal").val(),
+                                    };
+                                    $.post("change_client", params).done(function(data) {
+                                        window.location.href = 'page_refresh';
+                                    });
+                                }
+                                function getCurrentClient(){
+                                    $("#selectClientGlobal").prop('disabled', true);
+                                    $('#selectClientGlobal')
+                                        .empty()
+                                        .append('<option>LOADING...</option>');
+                                    $.post("select_clientglobal").done(function(data) {
+                                        $("#selectClientGlobal").html(data);
+                                        $("#selectClientGlobal").prop('disabled', false);
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </li>
+                    <?php } ?>
                 </ul>
             </div>
         </div>

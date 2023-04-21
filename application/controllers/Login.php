@@ -30,6 +30,15 @@ class Login extends CI_Controller {
 				if($data["position"] != 'client'){
 					$_SESSION["clientaccess"] = $data["clientaccess"];
 					$_SESSION["entityaccess"] = $data["entityaccess"];
+
+					$res = $this->data->select_client();
+					$i = 0;
+					foreach ($res as $v) {
+						if($i == 0){
+							$_SESSION["clientid"] = $v["clientid"];
+						}
+						$i++;
+					}
 				}else{
 					$_SESSION["clientaccess"] = "''";
 					$_SESSION["entityaccess"] = "''";

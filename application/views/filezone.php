@@ -117,15 +117,6 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label class="form-control-label">Client</label>
-                                    <select class="form-control" id="selectClientReview" onchange="GetEntityReview('', 'Confirmed')"></select>
-                                    <div id='val_selectClientReview'></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
                                     <label class="form-control-label">Entity</label>
                                     <select class="form-control" id="selectEntityReview"></select>
                                     <div id='val_selectEntityReview'></div>
@@ -382,13 +373,6 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <select class="form-control" id="selectClient2" onchange="GetEntity4('Approved')"><option value=''>Select Entity</option></select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="form-group">
                                         <select class="form-control" id="selectEntity3" onchange="loadFilesList('btgfile')"></select>
                                     </div>
                                 </div>
@@ -429,13 +413,6 @@
                                 <div class="col">
                                     <div class="form-group">
                                         <label class="form-control-label">This is to connfirm that the BAS files are all uploaded and ready for review.</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="form-group">
-                                        <select class="form-control" id="selectClient2" onchange="GetEntity4('Confirmed')"><option value=''>Select Entity</option></select>
                                     </div>
                                 </div>
                             </div>
@@ -557,22 +534,11 @@
                         <!-- Card header -->
                         <div class="card-body">
                             <div class="row">
-                                <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
-                                    <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
-                                    <div class="col-md-2">
-                                        <select class="form-control" id="selectClient" onchange="loadFiles(), GetEntity2()"></select>
-                                    </div>
-                                <?php } ?>
                                 <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Entity:</label>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectEntity2" onchange="loadFiles()"><option value='ALL'>ALL</option></select>
                                 </div>
-                                <?php if($_SESSION["position"] == "client" && $_SESSION["position"] != "admin"){ ?>
-                                    <div class="col-md-5"></div>
-                                <?php } ?>
-                                <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer") && $_SESSION["position"] != "admin"){ ?>
-                                    <div class="col-md-2"></div>
-                                <?php } ?>
+                                <div class="col-md-5"></div>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadFiles()"></select>
                                 </div>
@@ -644,16 +610,16 @@
                                 </div>
                                 <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
                                     <div class="col-md-2 text-right">
-                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilereview" onclick="newFileReview()">Upload BAS Files</button></h3>
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalFilereview" onclick="GetEntityReview('', 'Confirmed'), newFileReview()">Upload BAS Files</button></h3>
                                     </div>
                                     <div class="col-md-2 text-right">
-                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForApprove" onclick="GetClient2(), GetEntity4('')">Confirm BAS Files</button></h3>
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForApprove" onclick="GetEntity4('Confirmed')">Confirm BAS Files</button></h3>
                                     </div>
                                 <?php } ?>
                                 <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
                                     <div class="col-md-2 text-right"></div>
                                     <div class="col-md-2 text-right">
-                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReview" onclick="GetClient2(), GetEntity4('')">Approve BAS Files</button></h3>
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReview" onclick="GetEntity4('Approved')">Approve BAS Files</button></h3>
                                     </div>
                                 <?php } ?>
                                 <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
@@ -703,8 +669,6 @@
     GetYear2();
     GetMonthReview();
     GetYearReview();
-    GetClient();
-    GetClientReview();
     GetFileType();
     GetEntity();
     GetEntity2();
@@ -715,7 +679,6 @@
         params = {
             filemonth   : $("#selectMonth").val(),
             fileyear    : $("#selectYear").val(),
-            client      : $("#selectClient").val(),
             entity      : $("#selectEntity2").val(),
         };
         $.post("select_filezone", params).done(function(data) {
@@ -728,7 +691,6 @@
     function loadFilesList(filecateg){
         $("#div_filelist_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         params = {
-            clientid        : $("#selectClient2").val(),
             filemonth       : $("#selectMonth").val(),
             fileyear        : $("#selectYear").val(),
             entity          : $("#selectEntity3").val(),
@@ -741,7 +703,6 @@
     function loadFilesListFinal(filecateg){
         $("#div_filebas_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         params = {
-            clientid        : $("#selectClient2").val(),
             filemonth       : $("#selectMonth").val(),
             fileyear        : $("#selectYear").val(),
             entity          : $("#selectEntityBas").val(),
@@ -826,7 +787,7 @@
         $('#selectEntity')
             .empty()
             .append('<option value="">LOADING...</option>');
-        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+        $.post("select_entity", { }, function(data) {
             //console.log(data);
             $("#selectEntity").html(data);
             $("#selectEntity").prop('disabled', false);
@@ -838,7 +799,7 @@
         $('#selectEntity3')
             .empty()
             .append('<option value="">LOADING...</option>');
-        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+        $.post("select_entity", { }, function(data) {
             $("#selectEntity3").html(data);
             $("#selectEntity3").prop('disabled', false);
         });
@@ -850,7 +811,7 @@
         $('#selectEntityBas')
             .empty()
             .append('<option value="">LOADING...</option>');
-        $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
+        $.post("select_entity", { }, function(data) {
             $("#selectEntityBas").html(data);
             $("#selectEntityBas").prop('disabled', false);
         });
@@ -866,7 +827,6 @@
         params = {
             fileMonth   : $("#selectMonth").val(),
             fileYear    : $("#selectYear").val(),
-            clientid    : $("#selectClient2").val(),
             trailstatus : tstatus,
         };
         $.post("select_entity_staff", params , function(data) {
@@ -884,7 +844,6 @@
         params = {
             fileMonth   : $("#selectMonthReview").val(),
             fileYear    : $("#selectYearReview").val(),
-            clientid    : $("#selectClientReview").val(),
             trailstatus : tstatus,
         };
         $.post("select_entity_staff", params , function(data) {
@@ -896,56 +855,14 @@
         });
     }
     function GetEntity2(){
-        if($('#selectClient').val() == 'ALL' || $('#selectClient').val() == 'LOADING...'){
-            $("#selectEntity2").val('ALL');
-            $("#selectEntity2").prop('disabled', true);
-        }
-        else{
-            $("#selectEntity2").prop('disabled', true);
-            $('#selectEntity2')
-                .empty()
-                .append('<option value="">LOADING...</option>');
-            $.post("select_entity", { id: $('#selectClient').val() }, function(data) {
-                //console.log(data);
-                $("#selectEntity2").html(data);
-                $("#selectEntity2").prop('disabled', false);
-            });
-        }
-    }
-    function GetClient(){
-        <?php if($_SESSION["position"] == "staff" && $_SESSION["position"] != "admin"){ ?>
-            $("#selectEntity2").val('ALL');
-            $("#selectEntity2").prop('disabled', true);
-        <?php } ?>
-        $("#selectClient").prop('disabled', true);
-        $('#selectClient')
+        $("#selectEntity2").prop('disabled', true);
+        $('#selectEntity2')
             .empty()
-            .append('<option>LOADING...</option>');
-        $.post("select_client").done(function(data) {
-            $("#selectClient").html(data);
-            $("#selectClient").prop('disabled', false);
-        });
-    }
-    function GetClient2(){
-        $("#selectEntity3").prop('disabled', true);
-        $("#selectClient2").prop('disabled', true);
-        $('#selectClient2')
-            .empty()
-            .append('<option>LOADING...</option>');
-        $.post("select_clientname").done(function(data) {
-            $("#selectClient2").html(data);
-            $("#selectClient2").prop('disabled', false);
-        });
-    }
-    function GetClientReview(){
-        $("#selectEntityReview").prop('disabled', true);
-        $("#selectClientReview").prop('disabled', true);
-        $('#selectClientReview')
-            .empty()
-            .append('<option>LOADING...</option>');
-        $.post("select_clientname").done(function(data) {
-            $("#selectClientReview").html(data);
-            $("#selectClientReview").prop('disabled', false);
+            .append('<option value="">LOADING...</option>');
+        $.post("select_entity", { }, function(data) {
+            //console.log(data);
+            $("#selectEntity2").html(data);
+            $("#selectEntity2").prop('disabled', false);
         });
     }
     function newFile(){
@@ -984,8 +901,7 @@
             $("#fileNameReview").text(filezone.filename);
             $("#selectMonthReview").val(filezone.month);
             $("#selectYearReview").val(filezone.year);
-            $("#selectClientReview").val(filezone.clientid);
-            GetEntityReview(filezone.fileentity,'Approved');
+            GetEntityReview(filezone.fileentity,'Confirmed');
         });
     }
     function deleteFile(id){
@@ -1039,8 +955,6 @@
         $("#fileNameReview").text("");
         $("#file_to_upload_review").val("");
         $("#selectEntityReview").val("");
-        $("#selectClientReview").val("");
-        $("#val_selectClientReview").empty();
         $("#val_selectEntityReview").empty();
         $("#val_fileNameReview").empty();
     }
@@ -1072,10 +986,6 @@
     });
     function testFileReview(){
         var numVal = 0;
-        if($("#selectClientReview").val() == ''){
-            $("#val_selectClientReview").empty().append("<label style='color:red; font-style:italic;'>Please select a client</label>");
-            numVal += 1;
-        }
         if($("#selectEntityReview").val() == ''){
             $("#val_selectEntityReview").empty().append("<label style='color:red; font-style:italic;'>Please select an entity</label>");
             numVal += 1;
@@ -1086,9 +996,6 @@
         }
         return numVal;
     }
-    $('#selectClientReview').on('change', function() {
-        $("#val_selectClientReview").empty();
-    });
     $('#selectEntityReview').on('change', function() {
         $("#val_selectEntityReview").empty();
     });
@@ -1134,7 +1041,6 @@
                 fileName    : $("#fileNameReview").text(),
                 fileMonth   : $("#selectMonthReview").val(),
                 fileYear    : $("#selectYearReview").val(),
-                clientid    : $("#selectClientReview").val(),
                 fileEntity  : $("#selectEntityReview").val(),
             };
             if(saveStatus == 'Upload BTG File'){
@@ -1142,7 +1048,7 @@
                     swal("Saved!", "BGT File successfully submitted!", "success");
                     $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
-                        saveToFolderReview($("#selectEntityReview").val(),$("#selectClientReview").val());
+                        saveToFolderReview($("#selectEntityReview").val());
                     }
                     loadFiles();
                 });
@@ -1169,7 +1075,6 @@
         params = {
             fileMonth   : $("#selectMonth").val(),
             fileYear    : $("#selectYear").val(),
-            clientid    : $("#selectClient2").val(),
             fileEntity  : filentitybas,
             trailstatus : status,
         };
@@ -1219,10 +1124,10 @@
         }
         });
     }
-    function saveToFolderReview(entity,clientid){
+    function saveToFolderReview(entity){
         var formEl = document.forms.form_upload_review;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity + '&clientid=' + clientid,
+            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity,
             type:"post",
             data:new FormData(formEl),
             processData:false,

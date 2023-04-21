@@ -76,6 +76,34 @@ class Page extends CI_Controller
 		$_SESSION["activepage"] = "N/A";
 		$this->load->view("profile");
 	}
+	function page_refresh(){
+		if($_SESSION["activepage"] == "HOME"){
+			redirect("Page/home");
+		}
+		if($_SESSION["activepage"] == "DASHBOARDS"){
+			redirect("Page/dashboards");
+		}
+		if($_SESSION["activepage"] == "FILEZONE"){
+			redirect("Page/filezone");
+		}
+	}
+	function change_client(){
+		$post = $this->security->xss_clean($this->input->post());
+		$_SESSION["clientid"] = $post["clientGLobal"];
+	}
+	function select_clientglobal()
+	{
+		$option = "";
+		$res = $this->data->select_client_all();
+		foreach ($res as $v) {
+			if($v["clientid"] == $_SESSION["clientid"]){
+				$option .= "<option value='" . $v["clientid"] . "'  selected>" . $v["clientname"] . "</option>";
+			}else{
+				$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
+			}
+		}
+		echo $option;
+	}
 	function change_password() {
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->select_account($_SESSION["username"],$post["currentpassword"]);
@@ -123,7 +151,7 @@ class Page extends CI_Controller
 	function select_filezone()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
+		$client = $_SESSION["clientid"];
 		$entity = "";
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
@@ -132,22 +160,12 @@ class Page extends CI_Controller
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
 		}
-		if (isset($post["client"])) {
-			if ($post["client"] == 'LOADING...') {
-				$client = "%%";
-			} else {
-				$client = $post["client"];
-			}
-		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
 				$entity = "";
 			} else {
 				$entity = $post["entity"];
 			}
-		}
-		if($_SESSION["position"] == "client"){
-			$client = $_SESSION["clientid"];
 		}
 		$data["filezone"] = $this->data->select_filezone($post["filemonth"], $post["fileyear"], $client, $entity);
 		$this->load->view("filezone_table", $data);
@@ -155,7 +173,7 @@ class Page extends CI_Controller
 	function select_filereview()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
+		$client = $_SESSION["clientid"];
 		$entity = "";
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
@@ -164,13 +182,6 @@ class Page extends CI_Controller
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
 		}
-		if (isset($post["client"])) {
-			if ($post["client"] == 'LOADING...') {
-				$client = "%%";
-			} else {
-				$client = $post["client"];
-			}
-		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
 				$entity = "";
@@ -178,21 +189,13 @@ class Page extends CI_Controller
 				$entity = $post["entity"];
 			}
 		}
-		if($_SESSION["position"] == "client"){
-			$client = $_SESSION["clientid"];
-		}
 		$data["filereview"] = $this->data->select_filereview($post["filemonth"], $post["fileyear"], $client, $entity);
 		$this->load->view("filereview_table", $data);
 	}
 	function select_filelist()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["clientid"])) {
-			$client = $post["clientid"];
-		}else{
-			$client = $_SESSION["clientid"];
-		}
+		$client = $_SESSION["clientid"];
 		$data["filezone"] = $this->data->select_filelist($post["filemonth"], $post["fileyear"], $client, $post["entity"], $post["filecategory"]);
 		$data["fileaudit"] = $this->data->select_fileaudittrail($post["filemonth"], $post["fileyear"], $client, $post["entity"]);
 		$data["filecategory"] = $post["filecategory"];
@@ -280,13 +283,7 @@ class Page extends CI_Controller
 	}
 	function select_entity()
 	{
-		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["id"])) {
-			$client = $post["id"];
-		} else {
-			$client = $_SESSION["clientid"];
-		}
+		$client = $_SESSION["clientid"];
 		$option = "";
 		$res = $this->data->select_entity($client);
 		if ($_SESSION["position"] != "client") {
@@ -316,7 +313,7 @@ class Page extends CI_Controller
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$option = "";
-		$res = $this->data->select_entity_staff($post["fileMonth"], $post["fileYear"], $post["clientid"], $post["trailstatus"]);
+		$res = $this->data->select_entity_staff($post["fileMonth"], $post["fileYear"], $_SESSION["clientid"], $post["trailstatus"]);
 		$option .= "<option value=''>Select Entity</option>";
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
@@ -469,13 +466,7 @@ class Page extends CI_Controller
 	{
 		//($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["clientid"])) {
-			$client = $post["clientid"];
-		}else{
-			$client = $_SESSION["clientid"];
-		}
-
+		$client = $_SESSION["clientid"];
 		$this->data->insert_fileaudittrail(
 			$client,
 			$post["fileEntity"],
@@ -591,7 +582,7 @@ class Page extends CI_Controller
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_filereview(
 			$post["fileName"],
-			$post["clientid"],
+			$_SESSION["clientid"],
 			$post["fileMonth"],
 			$post["fileYear"],
 			$post["fileEntity"]
@@ -620,7 +611,7 @@ class Page extends CI_Controller
 		$this->data->update_filereview(
 			$post["fileid"],
 			$post["fileName"],
-			$post["clientid"],
+			$_SESSION["clientid"],
 			$post["fileMonth"],
 			$post["fileYear"],
 			$post["fileEntity"]
@@ -679,8 +670,8 @@ class Page extends CI_Controller
 	function upload_file_review()
 	{
 		$get = $this->security->xss_clean($this->input->get());
-		if (!is_dir('assets/files/' . $get["clientid"] . '/' . $get["entity"])) {
-			mkdir('./assets/files/' . $get["clientid"] . '/' . $get["entity"], 0777, true);
+		if (!is_dir('assets/files/' . $_SESSION["clientid"] . '/' . $get["entity"])) {
+			mkdir('./assets/files/' . $_SESSION["clientid"] . '/' . $get["entity"], 0777, true);
 			$dir_exist = false; // dir not exist
 		}
 		$config['upload_path'] = 'assets/files/' . $get["clientid"] . '/' . $get["entity"] . '/';
