@@ -34,17 +34,11 @@
                             <span class="nav-link-text">Dashboards</span>
                         </a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="workflow"  style="<?php echo ($_SESSION["activepage"] == "WORKFLOW") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
-                            <i class="ni ni-single-copy-04 text-black"></i>
-                            <span class="nav-link-text">Workflow</span>
-                        </a>
-                    </li> -->
                     <li class="nav-item">
                         <a class="nav-link" href="#navbar-history" data-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="navbar-history">
                             <i class="ni ni-ungroup text-black"></i>
-                            <span class="nav-link-text">History</span>
+                            <span class="nav-link-text" style="<?php echo ($_SESSION["activepage"] == "BASHISTORY" || $_SESSION["activepage"] == "SOURCEDATA") ? "font-weight: bold; text-decoration:underline;" : "" ?>">History</span>
                         </a>
                         <div class="collapse" id="navbar-history">
                             <ul class="nav nav-sm flex-column">
@@ -52,10 +46,14 @@
                                     <a href="#" class="nav-link">Lodged BASs</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">BAS Reports</a>
+                                    <a href="bashistory" class="nav-link"  style="<?php echo ($_SESSION["activepage"] == "BASHISTORY") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
+                                        BAS Reports
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">Source Data</a>
+                                    <a href="sourcedata" class="nav-link"  style="<?php echo ($_SESSION["activepage"] == "SOURCEDATA") ? "font-weight: bold; text-decoration:underline;" : "" ?>">
+                                        Source Data
+                                    </a>
                                 </li>
                             </ul>
                         </div>

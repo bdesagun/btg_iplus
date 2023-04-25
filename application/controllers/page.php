@@ -39,6 +39,16 @@ class Page extends CI_Controller
 		$data = $this->data->select_iframe_page('Dashboard');
 		$this->load->view("dashboards",$data);
 	}
+	function bashistory()
+	{
+		$_SESSION["activepage"] = "BASHISTORY";
+		$this->load->view("bashistory");
+	}
+	function sourcedata()
+	{
+		$_SESSION["activepage"] = "SOURCEDATA";
+		$this->load->view("sourcedata");
+	}
 	function accounts()
 	{
 		if ($_SESSION["position"] == "admin") {
@@ -85,6 +95,12 @@ class Page extends CI_Controller
 		}
 		if($_SESSION["activepage"] == "FILEZONE"){
 			redirect("Page/filezone");
+		}
+		if($_SESSION["activepage"] == "BASHISTORY"){
+			redirect("Page/bashistory");
+		}
+		if($_SESSION["activepage"] == "SOURCEDATA"){
+			redirect("Page/sourcedata");
 		}
 	}
 	function change_client(){
@@ -168,7 +184,12 @@ class Page extends CI_Controller
 			}
 		}
 		$data["filezone"] = $this->data->select_filezone($post["filemonth"], $post["fileyear"], $client, $entity);
-		$this->load->view("filezone_table", $data);
+		if($_SESSION["activepage"] == "FILEZONE"){
+			$this->load->view("filezone_table", $data);
+		}
+		if($_SESSION["activepage"] == "SOURCEDATA"){
+			$this->load->view("sourcedata_table", $data);
+		}
 	}
 	function select_filereview()
 	{
@@ -190,7 +211,12 @@ class Page extends CI_Controller
 			}
 		}
 		$data["filereview"] = $this->data->select_filereview($post["filemonth"], $post["fileyear"], $client, $entity);
-		$this->load->view("filereview_table", $data);
+		if($_SESSION["activepage"] == "FILEZONE"){
+			$this->load->view("filereview_table", $data);
+		}
+		if($_SESSION["activepage"] == "BASHISTORY"){
+			$this->load->view("bashistory_table", $data);
+		}
 	}
 	function select_filelist()
 	{
