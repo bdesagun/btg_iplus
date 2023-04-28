@@ -141,8 +141,62 @@ class Page extends CI_Controller
 			echo 'available';
 		}
 	}
-	function select_home(){
-		$this->load->view("home_table");
+	function select_bas_progress(){
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		$option = "";
+		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
+		$last_date = date("Y-m-t", $date);
+		$last_day = date('d', strtotime($last_date));
+		for($d = 1; $d <= $last_day; $d ++){
+			$option .= "<option value='" . $d . "'>" . sprintf('%02d',$d) . "</option>";
+		}
+		$data["fileday"] = $option;
+		$data["progress"] = $this->data->select_bas_progress($post["filemonth"], $post["fileyear"], $client);
+		$data["filemonth"] = $post["filemonth"];
+		$this->load->view("home_table", $data);
+	}
+	function select_due(){
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		$data = $this->data->select_due($post["filemonth"], $post["fileyear"], $client);
+		echo json_encode($data);
+	}
+	function save_due(){
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		$this->data->save_due(
+			$client,
+			$post["filemonth"],
+			$post["fileyear"],
+			$post["data_request"],
+			$post["data_upload"],
+			$post["bas_preparation"],
+			$post["bas_review"],
+			$post["bas_sign_off"],
+			$post["bas_lodgement"]
+		);
 	}
 	function select_account_list()
 	{

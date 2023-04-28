@@ -143,6 +143,42 @@ class Data extends CI_Model {
 				checklist";
 		return $this->db->query($q)->result_array();
 	}
+	public function select_bas_progress($filemonth, $fileyear, $client)
+	{
+		$q = "SELECT
+			b.value,
+			((COUNT(a.entity) * 17) + 10) AS progress,
+            CASE
+            	WHEN COUNT(a.entity) = 1 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', data_upload, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 2 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 3 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_review, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 4 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+			END AS 'barcolor'
+		FROM dropdown b
+		LEFT JOIN fileaudittrail a ON a.clientid = b.subcategory AND a.entity = b.value AND a.month = ? AND a.year = ?
+        LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
+		WHERE b.category = 'client' AND b.subcategory = ?
+		GROUP BY b.value";
+		$params = array($filemonth, $fileyear, $client);
+		return $this->db->query($q,$params)->result_array();
+	}
+	public function select_due($filemonth, $fileyear, $client)
+	{
+		$q = "SELECT * FROM filedue WHERE month = ? AND year = ? AND clientid = ?";
+		$params = array($filemonth, $fileyear, $client);
+		return $this->db->query($q,$params)->row_array();
+	}
+	public function save_due($clientid, $filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement)
+	{
+		//SELECT MONTH(STR_TO_DATE('April 3, 2023', '%M %d, %Y'));
+		//SELECT STR_TO_DATE('April 3, 2023', '%M %d, %Y');
+		$q = "DELETE FROM filedue WHERE clientid = ? AND month = ? AND year = ?";
+		$params = array($clientid, $filemonth, $fileyear);
+		$this->db->query($q, $params);
+		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
+		$params = array($clientid, $filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
+		$this->db->query($q, $params);
+	}
 	public function select_filelist($filemonth, $fileyear, $client, $entity, $filecategory)
 	{
 		$q = "SELECT

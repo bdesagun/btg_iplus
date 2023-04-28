@@ -55,10 +55,10 @@
                             <div class="row">
                                 <label for="example-text-input" class="col-md-8 col-form-label form-control-label text-right">GST Filing Period:</label>
                                 <div class="col-md-2">
-                                    <select class="form-control" id="selectMonth" onchange="loadFiles()"></select>
+                                    <select class="form-control" id="selectMonth" onchange="loadHome()"></select>
                                 </div>
                                 <div class="col-md-2">
-                                    <select class="form-control" id="selectYear" onchange="loadFiles()"></select>
+                                    <select class="form-control" id="selectYear" onchange="loadHome()"></select>
                                 </div>
                             </div>
                         </div>
@@ -77,14 +77,23 @@
     loadHome();
     function loadHome(){
         $("#div_home_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
-        // params = {
-        //     filemonth   : $("#selectMonth").val(),
-        //     fileyear    : $("#selectYear").val(),
-        //     client      : $("#selectClient").val(),
-        //     entity      : $("#selectEntity2").val(),
-        // };
-        $.post("select_home").done(function(data) {
+        params = {
+            filemonth   : $("#selectMonth").val(),
+            fileyear    : $("#selectYear").val(),
+        };
+        $.post("select_bas_progress", params).done(function(data) {
             $("#div_home_table").html(data);
+            $.post("select_due", params).done(function(data) {
+                var due = JSON.parse(data);
+                if (due){
+                    $("#data_request").val(due.data_request);
+                    $("#data_upload").val(due.data_upload);
+                    $("#bas_preparation").val(due.bas_preparation);
+                    $("#bas_review").val(due.bas_review);
+                    $("#bas_sign_off").val(due.bas_sign_off);
+                    $("#bas_lodgement").val(due.bas_lodgement);
+                }
+            });
         });
     }
     function GetMonth(){
@@ -105,6 +114,22 @@
         $.post("select_year").done(function(data) {
             $("#selectYear").html(data);
             $("#selectYear").prop('disabled', false);
+        });
+    }
+    function saveDue(){
+        var params;
+        params = {
+            filemonth       : $("#selectMonth").val(),
+            fileyear        : $("#selectYear").val(),
+            data_request    : $("#data_request").val(),
+            data_upload     : $("#data_upload").val(),
+            bas_preparation : $("#bas_preparation").val(),
+            bas_review      : $("#bas_review").val(),
+            bas_sign_off    : $("#bas_sign_off").val(),
+            bas_lodgement   : $("#bas_lodgement").val(),
+        };
+        $.post("save_due",params).done(function(data) {
+            loadHome();
         });
     }
 </script>
