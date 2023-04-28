@@ -27,7 +27,7 @@ class Login extends CI_Controller {
 				$_SESSION["position"] = $data["position"];
 				$_SESSION["clientid"] = $data["clientid"];
 				$_SESSION["clientname"] = $data["clientname"];
-				if($data["position"] != 'client'){
+				if($data["position"] != 'client' && $data["position"] != 'admin'){
 					$_SESSION["clientaccess"] = $data["clientaccess"];
 					$_SESSION["entityaccess"] = $data["entityaccess"];
 

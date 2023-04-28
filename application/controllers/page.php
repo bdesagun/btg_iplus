@@ -151,6 +151,13 @@ class Page extends CI_Controller
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
 		}
+		if (isset($post["client"])) {
+			if ($post["client"] == 'LOADING...') {
+				$client = "%%";
+			} else {
+				$client = $post["client"];
+			}
+		}
 		$option = "";
 		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
 		$last_date = date("Y-m-t", $date);
@@ -178,7 +185,6 @@ class Page extends CI_Controller
 	}
 	function save_due(){
 		$post = $this->security->xss_clean($this->input->post());
-		$client = $_SESSION["clientid"];
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
 			$post["filemonth"] = $dateObj->format('F');
@@ -187,7 +193,6 @@ class Page extends CI_Controller
 			$post["fileyear"] = date('Y');
 		}
 		$this->data->save_due(
-			$client,
 			$post["filemonth"],
 			$post["fileyear"],
 			$post["data_request"],

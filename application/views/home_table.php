@@ -1,6 +1,9 @@
 <table class="table table-flush" id="table_home_info">
     <thead class="thead-light">
         <tr>
+            <?php if($_SESSION["position"] != "client"){ ?>
+                <th>Client</th>
+            <?php } ?>
             <th>Entity</th>
             <th style="width: 12%">
                 <div class="text-center">Data Request</div>
@@ -22,11 +25,14 @@
             </th>
         </tr>
         <tr>
+            <?php if($_SESSION["position"] != "client"){ ?>
+                <th></th>
+            <?php } ?>
             <th>DUE DATE</th>
             <th style="width: 12%">
                 <div class="text-center" style=" font-weight: bold;">
                     <?php echo $filemonth; ?>
-                    <select id="data_request" style="width: 50px" onchange="saveDue()" value="<?php echo $due['data_request'] ?>"><?php echo $fileday; ?></select>
+                    <select id="data_request" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
                 </div>
             </th>
             <th style="width: 12%">
@@ -62,14 +68,17 @@
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($progress as $row) { ?>
+        <?php  $temp= ''; foreach ($progress as $row) {; ?>
             <tr>
+                <?php if($_SESSION["position"] != "client"){ ?>
+                    <td><?php if($row['clientname'] != $temp ) {echo $row['clientname'];} ?></td>
+                 <?php } ?>
                 <td><?php echo $row['value']; ?></td>
                 <td colspan="6">
                     <button class="btn btn-<?php echo $row['barcolor']; ?> btn-sm" style="width: <?php echo $row['progress'] ?>%;"></button>
                 </td>
             </tr>
-        <?php } ?>
+        <?php $temp = $row['clientname'];} ?>
     </tbody>
 </table>
 <script>

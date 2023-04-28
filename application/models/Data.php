@@ -145,7 +145,11 @@ class Data extends CI_Model {
 	}
 	public function select_bas_progress($filemonth, $fileyear, $client)
 	{
+		if($client == 'ALL'){
+			$client = '%%';
+		}
 		$q = "SELECT
+			d.clientname,
 			b.value,
 			((COUNT(a.entity) * 17) + 10) AS progress,
             CASE
@@ -155,10 +159,13 @@ class Data extends CI_Model {
             	WHEN COUNT(a.entity) = 4 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
 			END AS 'barcolor'
 		FROM dropdown b
-		LEFT JOIN fileaudittrail a ON a.clientid = b.subcategory AND a.entity = b.value AND a.month = ? AND a.year = ?
+		LEFT JOIN clients d ON b.subcategory = d.clientid
+		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value AND a.month = ? AND a.year = ?
         LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
-		WHERE b.category = 'client' AND b.subcategory = ?
-		GROUP BY b.value";
+		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
+		AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")
+		GROUP BY b.value
+        ORDER BY d.clientname";
 		$params = array($filemonth, $fileyear, $client);
 		return $this->db->query($q,$params)->result_array();
 	}
@@ -168,15 +175,18 @@ class Data extends CI_Model {
 		$params = array($filemonth, $fileyear, $client);
 		return $this->db->query($q,$params)->row_array();
 	}
-	public function save_due($clientid, $filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement)
+	public function save_due($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement)
 	{
 		//SELECT MONTH(STR_TO_DATE('April 3, 2023', '%M %d, %Y'));
 		//SELECT STR_TO_DATE('April 3, 2023', '%M %d, %Y');
-		$q = "DELETE FROM filedue WHERE clientid = ? AND month = ? AND year = ?";
-		$params = array($clientid, $filemonth, $fileyear);
+		$q = "DELETE FROM filedue WHERE clientid IN (".$_SESSION["clientaccess"].") AND month = ? AND year = ?";
+		$params = array($filemonth, $fileyear);
 		$this->db->query($q, $params);
-		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
-		$params = array($clientid, $filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
+		//$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
+		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement)
+				SELECT clientid, ? AS month, ? AS year, ? AS data_request, ? AS data_upload, ? AS bas_preparation, ? AS bas_review, ? AS bas_sign_off, ? AS bas_lodgement
+				FROM clients WHERE clientid IN (".$_SESSION["clientaccess"].")";
+		$params = array($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
 		$this->db->query($q, $params);
 	}
 	public function select_filelist($filemonth, $fileyear, $client, $entity, $filecategory)

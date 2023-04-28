@@ -53,7 +53,13 @@
                         <!-- Card header -->
                         <div class="card-header">
                             <div class="row">
-                                <label for="example-text-input" class="col-md-8 col-form-label form-control-label text-right">GST Filing Period:</label>
+                                <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
+                                <div class="col-md-2">
+                                    <?php if($_SESSION["position"] != "client"){ ?>
+                                        <select class="form-control" id="selectClient" onchange="loadHome()"></select>
+                                    <?php } ?>
+                                </div>
+                                <label for="example-text-input" class="col-md-5 col-form-label form-control-label text-right">GST Filing Period:</label>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadHome()"></select>
                                 </div>
@@ -72,6 +78,7 @@
 </body>
 
 <script>
+    getClient();
     GetMonth();
     GetYear();
     loadHome();
@@ -80,6 +87,7 @@
         params = {
             filemonth   : $("#selectMonth").val(),
             fileyear    : $("#selectYear").val(),
+            client      : $("#selectClient").val(),
         };
         $.post("select_bas_progress", params).done(function(data) {
             $("#div_home_table").html(data);
@@ -94,6 +102,16 @@
                     $("#bas_lodgement").val(due.bas_lodgement);
                 }
             });
+        });
+    }
+    function getClient(){
+        $("#selectClient").prop('disabled', true);
+        $('#selectClient')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_client").done(function(data) {
+            $("#selectClient").html(data);
+            $("#selectClient").prop('disabled', false);
         });
     }
     function GetMonth(){
