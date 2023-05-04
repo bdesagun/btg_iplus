@@ -77,6 +77,10 @@ class Page extends CI_Controller
 			redirect("Page/home");
 		}
 	}
+	function email()
+	{
+		$this->load->view("mail_template/email_sample");
+	}
 	function update_iframe(){
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->update_iframe($post["pagename"],$post["pageurl"]);
