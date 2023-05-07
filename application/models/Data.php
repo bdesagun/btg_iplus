@@ -145,8 +145,12 @@ class Data extends CI_Model {
 	}
 	public function select_bas_progress($filemonth, $fileyear, $client)
 	{
+		$filter = "AND b.subcategory =".$_SESSION["clientid"];
 		if($client == 'ALL'){
 			$client = '%%';
+		}
+		if($_SESSION["position"] != "client"){
+			$filter = "AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")";
 		}
 		$q = "SELECT
 			d.clientname,
@@ -163,7 +167,7 @@ class Data extends CI_Model {
 		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value AND a.month = ? AND a.year = ?
         LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
 		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
-		AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")
+		".$filter."
 		GROUP BY b.value
         ORDER BY d.clientname";
 		$params = array($filemonth, $fileyear, $client);
@@ -402,7 +406,8 @@ class Data extends CI_Model {
 	}
 	public function select_filehistory($fileid)
 	{
-		$q = "SELECT * FROM filehistory WHERE fileid=?";
+		$q = "SELECT a.*, b.accountname FROM filehistory a
+			LEFT JOIN useraccount b ON a.updatedby = b.username WHERE a.fileid=?";
 		$params = array($fileid);
 		return $this->db->query($q,$params)->result_array();
 	}

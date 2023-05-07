@@ -1016,7 +1016,7 @@
                     swal("Saved!", "File successfully submitted!", "success");
                     $('#modalFilezone').modal('toggle');
                     if ($("#file_to_upload").val() != ""){
-                        saveToFolder($("#selectEntity").val());
+                        saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
                     }
                     loadFiles();
                 });
@@ -1025,7 +1025,7 @@
                     swal("Saved!", "File successfully updated!", "success");
                     $('#modalFilezone').modal('toggle');
                     if ($("#file_to_upload").val() != ""){
-                        saveToFolder($("#selectEntity").val());
+                        saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
                     }
                     loadFiles();
                 });
@@ -1048,7 +1048,7 @@
                     swal("Saved!", "BGT File successfully submitted!", "success");
                     $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
-                        saveToFolderReview($("#selectEntityReview").val());
+                        saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
                     }
                     loadFiles();
                 });
@@ -1057,7 +1057,7 @@
                     swal("Saved!", "BGT File successfully updated!", "success");
                     $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
-                        saveToFolder($("#selectEntityReview").val());
+                        saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
                     }
                     loadFiles();
                 });
@@ -1109,10 +1109,10 @@
             loadFiles();
         });
     }
-    function saveToFolder(entity){
+    function saveToFolder(entity, month, year){
         var formEl = document.forms.form_upload;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + entity,
+            url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + entity + '&month=' + month + '&year=' + year,
             type:"post",
             data:new FormData(formEl),
             processData:false,
@@ -1124,10 +1124,10 @@
         }
         });
     }
-    function saveToFolderReview(entity){
+    function saveToFolderReview(entity, month, year){
         var formEl = document.forms.form_upload_review;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity,
+            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity + '&month=' + month + '&year=' + year,
             type:"post",
             data:new FormData(formEl),
             processData:false,

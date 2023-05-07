@@ -689,10 +689,7 @@ class Page extends CI_Controller
 			$post["fileYear"],
 			$post["fileEntity"]
 		);
-		$data = $this->data->deny_filehistory($post["fileid"]);
-		if (!empty($data)) {
-			$this->data->insert_history("Updated", $post["fileid"], "");
-		}
+		$this->data->insert_history("Updated", $post["fileid"], "");
 	}
 	function update_filereview()
 	{
@@ -743,11 +740,11 @@ class Page extends CI_Controller
 	function upload_file()
 	{
 		$get = $this->security->xss_clean($this->input->get());
-		if (!is_dir('assets/files/' . $_SESSION["username"] . '/' . $get["entity"])) {
-			mkdir('./assets/files/' . $_SESSION["username"] . '/' . $get["entity"], 0777, true);
+		if (!is_dir('assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
+			mkdir('./assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
 			$dir_exist = false; // dir not exist
 		}
-		$config['upload_path'] = 'assets/files/' . $_SESSION["username"] . '/' . $get["entity"] . '/';
+		$config['upload_path'] = 'assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
 		$config['max_size'] = 20000000;
@@ -759,11 +756,11 @@ class Page extends CI_Controller
 	function upload_file_review()
 	{
 		$get = $this->security->xss_clean($this->input->get());
-		if (!is_dir('assets/files/' . $_SESSION["clientid"] . '/' . $get["entity"])) {
-			mkdir('./assets/files/' . $_SESSION["clientid"] . '/' . $get["entity"], 0777, true);
+		if (!is_dir('assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
+			mkdir('./assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
 			$dir_exist = false; // dir not exist
 		}
-		$config['upload_path'] = 'assets/files/' . $get["clientid"] . '/' . $get["entity"] . '/';
+		$config['upload_path'] = 'assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
 		$config['max_size'] = 20000000;

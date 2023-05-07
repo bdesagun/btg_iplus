@@ -7,7 +7,7 @@
             <div class="timeline-content">
                 <div class="d-flex justify-content-between pt-1">
                     <div>
-                        <span class="text-muted text-sm font-weight-bold"><?php echo $row['filestatus']; ?></span>
+                        <span class="text-muted text-sm font-weight-bold"><?php echo $row['filestatus']; ?>  by <?php echo $row['accountname']; ?></span>
                     </div>
                     <div class="text-right">
                         <small class="text-muted"><i class="fas fa-clock mr-1"></i><?php echo $row['filedate']; ?></small>

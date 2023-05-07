@@ -16,7 +16,7 @@
         <?php foreach ($filereview as $row) { ?>
             <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin") || (($_SESSION["position"] == "client" || $_SESSION["position"] == "admin") && ($row['trailstatus'] == 'Reviewed' || $row['trailstatus'] == 'ConfirmedBAS'))){ ?>
                 <tr>
-                    <td><a href="<?php echo base_url(); ?>assets/files/<?php echo $row['clientid']; ?>/<?php echo $row['fileentity']; ?>/<?php echo str_replace(' ','_',$row['filename']);?>" download><?php echo $row['filename']; ?></a></td>
+                    <td><a href="<?php echo base_url(); ?>assets/files/btg_file/<?php echo $row['clientid']; ?>/<?php echo $row['fileentity']; ?>/<?php echo $row['month']; ?>/<?php echo $row['year']; ?>/<?php echo str_replace(' ','_',$row['filename']);?>" download><?php echo $row['filename']; ?></a></td>
                     <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
                         <td><?php echo $row['clientname']; ?></td>
                     <?php } ?>

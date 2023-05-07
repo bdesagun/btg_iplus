@@ -27,44 +27,82 @@
         <tr>
             <?php if($_SESSION["position"] != "client"){ ?>
                 <th></th>
+                <th>DUE DATE</th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="data_request" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="data_upload" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="bas_preparation" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="bas_review" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="bas_sign_off" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <select id="bas_lodgement" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
+                    </div>
+                </th>
+            <?php }else{ ?>
+                <th>DUE DATE</th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="data_request" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="data_upload" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="bas_preparation" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="bas_review" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="bas_sign_off" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
+                <th style="width: 12%">
+                    <div class="text-center" style=" font-weight: bold;">
+                        <?php echo $filemonth; ?>
+                        <input id="bas_lodgement" style="width: 50px; outline: none; border: none transparent; background: transparent; font-weight: bold;" onchange="saveDue()"/>
+                    </div>
+                </th>
             <?php } ?>
-            <th>DUE DATE</th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="data_request" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="data_upload" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="bas_preparation" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="bas_review" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="bas_sign_off" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
-            <th style="width: 12%">
-                <div class="text-center" style=" font-weight: bold;">
-                    <?php echo $filemonth; ?>
-                    <select id="bas_lodgement" style="width: 50px" onchange="saveDue()"><?php echo $fileday; ?></select>
-                </div>
-            </th>
         </tr>
     </thead>
     <tbody>
