@@ -143,6 +143,11 @@ class Data extends CI_Model {
 				checklist";
 		return $this->db->query($q)->result_array();
 	}
+	public function select_audittrail()
+	{
+		$q = "SELECT * FROM audittrail ORDER BY updateddate DESC";
+		return $this->db->query($q)->result_array();
+	}
 	public function select_bas_progress($filemonth, $fileyear, $client)
 	{
 		$filter = "AND b.subcategory =".$_SESSION["clientid"];
@@ -192,6 +197,8 @@ class Data extends CI_Model {
 				FROM clients WHERE clientid IN (".$_SESSION["clientaccess"].")";
 		$params = array($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
 		$this->db->query($q, $params);
+
+		$this->data->insert_trail("Update schedule in home page. Month: ".$filemonth.", Year: ".$fileyear);
 	}
 	public function select_filelist($filemonth, $fileyear, $client, $entity, $filecategory)
 	{
@@ -620,6 +627,13 @@ class Data extends CI_Model {
 		$q = "SELECT * FROM filehistory WHERE filestatus='Returned' AND fileid=?";
 		$params = array($fileid);
 		return $this->db->query($q, $params)->result_array();
+	}
+	public function insert_trail($activiy)
+	{
+		$q = "INSERT INTO audittrail(activity, updatedby, updateddate)
+					VALUES(?, ?, current_timestamp)";
+		$params = array($activiy, $_SESSION["username"]);
+		$this->db->query($q, $params);
 	}
 	// public function select_session($referral_id){
 	// 	$q="SELECT * FROM tbl_session WHERE referral_id=?";

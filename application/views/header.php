@@ -56,6 +56,10 @@
                                 <i class="ni ni-single-02"></i>
                                 <span>Maintenance</span>
                             </a>
+                            <a href="audittrail" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Audit Trail</span>
+                            </a>
                         <?php } ?>
                         <div class="dropdown-divider"></div>
                         <a href="force_logout" class="dropdown-item">

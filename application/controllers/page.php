@@ -77,6 +77,15 @@ class Page extends CI_Controller
 			redirect("Page/home");
 		}
 	}
+	function audittrail()
+	{
+		if ($_SESSION["position"] == "admin") {
+			$_SESSION["activepage"] = "N/A";
+			$this->load->view("audittrail");
+		}else{
+			redirect("Page/home");
+		}
+	}
 	function email()
 	{
 		$this->load->view("mail_template/email_sample");
@@ -226,6 +235,12 @@ class Page extends CI_Controller
 			redirect("Page/home");
 		}
 		//$post = $this->security->xss_clean($this->input->post());
+	}
+	function select_audittrail()
+	{
+		//$post = $this->security->xss_clean($this->input->post());
+		$data["audit"] = $this->data->select_audittrail();
+		$this->load->view("audittrail_table", $data);
 	}
 	function select_filezone()
 	{
