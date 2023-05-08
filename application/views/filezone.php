@@ -412,7 +412,7 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label class="form-control-label">This is to connfirm that the BAS files are all uploaded and ready for review.</label>
+                                        <label class="form-control-label">This is to confirm that the BAS files are all uploaded and ready for review.</label>
                                     </div>
                                 </div>
                             </div>
@@ -1045,7 +1045,7 @@
             };
             if(saveStatus == 'Upload BTG File'){
                 $.post("insert_filereview",params).done(function(data) {
-                    swal("Saved!", "BGT File successfully submitted!", "success");
+                    swal("Saved!", "BTG File successfully submitted!", "success");
                     $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
                         saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
@@ -1054,7 +1054,7 @@
                 });
             }else{
                 $.post("update_filereview",params).done(function(data) {
-                    swal("Saved!", "BGT File successfully updated!", "success");
+                    swal("Saved!", "BTG File successfully updated!", "success");
                     $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
                         saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
