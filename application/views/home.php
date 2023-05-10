@@ -119,7 +119,7 @@
         $('#selectMonth')
             .empty()
             .append('<option>LOADING...</option>');
-        $.post("select_month").done(function(data) {
+        $.post("select_month_home").done(function(data) {
             $("#selectMonth").html(data);
             $("#selectMonth").prop('disabled', false);
         });
@@ -129,7 +129,7 @@
         $('#selectYear')
             .empty()
             .append('<option>LOADING...</option>');
-        $.post("select_year").done(function(data) {
+        $.post("select_year_home").done(function(data) {
             $("#selectYear").html(data);
             $("#selectYear").prop('disabled', false);
         });

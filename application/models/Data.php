@@ -169,19 +169,24 @@ class Data extends CI_Model {
 			END AS 'barcolor'
 		FROM dropdown b
 		LEFT JOIN clients d ON b.subcategory = d.clientid
-		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value AND a.month = ? AND a.year = ?
+		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value
+        	AND a.month = (SELECT x.month FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
+            AND a.year = (SELECT x.year FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
         LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
 		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
 		".$filter."
 		GROUP BY b.value
         ORDER BY d.clientname";
-		$params = array($filemonth, $fileyear, $client);
+		$params = array($client);
 		return $this->db->query($q,$params)->result_array();
 	}
 	public function select_due($filemonth, $fileyear, $client)
 	{
-		$q = "SELECT * FROM filedue WHERE month = ? AND year = ? AND clientid = ?";
-		$params = array($filemonth, $fileyear, $client);
+		$q = "SELECT * FROM filedue a WHERE
+			month = (SELECT x.month FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)
+			AND year = (SELECT x.year FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)
+			AND a.clientid = ?";
+		$params = array($client, $client, $client);
 		return $this->db->query($q,$params)->row_array();
 	}
 	public function save_due($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement)

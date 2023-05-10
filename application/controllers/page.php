@@ -345,6 +345,39 @@ class Page extends CI_Controller
 		}
 		echo $option;
 	}
+	function select_month_home()
+	{
+		$option = "";
+		$month = date('m');
+		for ($x = 1; $x <= 12; $x++) {
+			$dateObj = DateTime::createFromFormat('!m', $x);
+			$monthName = $dateObj->format('F');
+			$monthNameLess = "";
+			if($x == 1){
+				$dateObj = DateTime::createFromFormat('!m', 12);
+				$monthNameLess = $dateObj->format('F');
+			}else{
+				$dateObj = DateTime::createFromFormat('!m', $x - 1);
+				$monthNameLess = $dateObj->format('F');
+			}
+			if ($month == $x) {
+				$option .= "<option value='" . $monthName . "' selected>" . strtoupper($monthNameLess) . "</option>";
+			} else {
+				$option .= "<option value='" . $monthName . "'>" . strtoupper($monthNameLess) . "</option>";
+			}
+		}
+		echo $option;
+	}
+	function select_year_home()
+	{
+		$option = "";
+		$year = date('Y');
+		for ($x = 1; $x <= 5; $x++) {
+			$option .= "<option value='" . $year . "'>" . $year . "</option>";
+			$year = $year - 1;
+		}
+		echo $option;
+	}
 	function select_filetype()
 	{
 		$option = "";
@@ -565,12 +598,10 @@ class Page extends CI_Controller
 			$data["entityname"] = $post["fileEntity"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_client_confirm',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			// $myScript = APPPATH . 'py\email_reset_password.py';
-			// $output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
-			// $this->data->insert_trail($output);
+			$myScript = APPPATH . 'py\email_client_confirm.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Approved'){
 			$data = $this->data->select_email_recipient('reviewer', $client, $post["fileEntity"]);
@@ -578,20 +609,10 @@ class Page extends CI_Controller
 			$data["entityname"] = $post["fileEntity"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_staff_confirm',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_staff_confirm.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Reviewed'){
 			$data = $this->data->select_email_recipient('client', $client, '');
@@ -601,43 +622,21 @@ class Page extends CI_Controller
 			$data["year"] = $post["fileYear"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_reviewer_approve',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_reviewer_approve.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -bm "'.$data["month"].'" -by "'.$data["year"].'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'ConfirmedBAS'){
 			$data = $this->data->select_email_recipient('staff', $client, $post["fileEntity"]);
 			$data["clientdetail"] = $this->data->get_client($client);
 			$data["entityname"] = $post["fileEntity"];
-			$data["month"] = $post["fileMonth"];
-			$data["year"] = $post["fileYear"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_client_approve',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_client_approve.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 	}
 	function insert_file()
