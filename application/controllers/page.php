@@ -458,12 +458,10 @@ class Page extends CI_Controller
 		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
 		$post = $this->security->xss_clean($this->input->post());
         $to = $post["email"];
-        $subject = 'BTGI Plus Account Reset Password';
+        $subject = 'BTGI Plus Account Reset Password (New User)';
 		$data["emailcode"] = $emailcode;
-		$data["username"] = $post["username"];
-		$data["password"] = $genpassword;
-        $message = $this->load->view('mail_template/reset_password_template',$data,true);
-        $from = $this->config->item('smtp_user');
+		$uname = $post["username"];
+		$upass = $genpassword;
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_account(
 			$post["username"],
@@ -474,17 +472,9 @@ class Page extends CI_Controller
 			$data["emailcode"]
 		);
 		$this->data->reset_account($post["username"], $genpassword);
-        $this->email->set_newline("\r\n");
-        $this->email->from($from);
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-
-        if ($this->email->send()) {
-            echo 'Your Email has successfully been sent.';
-        } else {
-            show_error($this->email->print_debugger());
-        }
+		$myScript = APPPATH . 'py\email_reset_password.py';
+		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$this->data->insert_trail($output);
 	}
 	function reset_account()
 	{
@@ -493,23 +483,12 @@ class Page extends CI_Controller
 		$post = $this->security->xss_clean($this->input->post());
         $to = $post["email"];
         $subject = 'BTGI Plus Account Reset Password';
-		$data["username"] = $post["username"];
-		$data["password"] = $genpassword;
-        $message = $this->load->view('mail_template/reset_password_template',$data,true);
-        $from = $this->config->item('smtp_user');
+		$uname = $post["username"];
+		$upass = $genpassword;
 		$this->data->reset_account($post["username"], $genpassword);
-
-        $this->email->set_newline("\r\n");
-        $this->email->from($from);
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-
-        if ($this->email->send()) {
-            echo 'Your Email has successfully been sent.';
-        } else {
-            show_error($this->email->print_debugger());
-        }
+		$myScript = APPPATH . 'py\email_reset_password.py';
+		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$this->data->insert_trail($output);
 	}
 	function update_account()
 	{
@@ -589,17 +568,9 @@ class Page extends CI_Controller
 			$message = $this->load->view('mail_template/email_client_confirm',$data,true);
 			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			// $myScript = APPPATH . 'py\email_reset_password.py';
+			// $output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+			// $this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Approved'){
 			$data = $this->data->select_email_recipient('reviewer', $client, $post["fileEntity"]);
