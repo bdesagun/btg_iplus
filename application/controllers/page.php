@@ -39,9 +39,19 @@ class Page extends CI_Controller
 		$data = $this->data->select_iframe_page('Dashboard');
 		$this->load->view("dashboards",$data);
 	}
+	function bashistory()
+	{
+		$_SESSION["activepage"] = "BASHISTORY";
+		$this->load->view("bashistory");
+	}
+	function sourcedata()
+	{
+		$_SESSION["activepage"] = "SOURCEDATA";
+		$this->load->view("sourcedata");
+	}
 	function accounts()
 	{
-		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+		if ($_SESSION["position"] == "admin") {
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("accounts");
 		}else{
@@ -50,7 +60,7 @@ class Page extends CI_Controller
 	}
 	function clients()
 	{
-		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
+		if ($_SESSION["position"] == "admin") {
 			$_SESSION["activepage"] = "N/A";
 			$this->load->view("clients");
 		}else{
@@ -67,6 +77,19 @@ class Page extends CI_Controller
 			redirect("Page/home");
 		}
 	}
+	function audittrail()
+	{
+		if ($_SESSION["position"] == "admin") {
+			$_SESSION["activepage"] = "N/A";
+			$this->load->view("audittrail");
+		}else{
+			redirect("Page/home");
+		}
+	}
+	function email()
+	{
+		$this->load->view("mail_template/email_sample");
+	}
 	function update_iframe(){
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->update_iframe($post["pagename"],$post["pageurl"]);
@@ -75,6 +98,40 @@ class Page extends CI_Controller
 	{
 		$_SESSION["activepage"] = "N/A";
 		$this->load->view("profile");
+	}
+	function page_refresh(){
+		if($_SESSION["activepage"] == "HOME"){
+			redirect("Page/home");
+		}
+		if($_SESSION["activepage"] == "DASHBOARDS"){
+			redirect("Page/dashboards");
+		}
+		if($_SESSION["activepage"] == "FILEZONE"){
+			redirect("Page/filezone");
+		}
+		if($_SESSION["activepage"] == "BASHISTORY"){
+			redirect("Page/bashistory");
+		}
+		if($_SESSION["activepage"] == "SOURCEDATA"){
+			redirect("Page/sourcedata");
+		}
+	}
+	function change_client(){
+		$post = $this->security->xss_clean($this->input->post());
+		$_SESSION["clientid"] = $post["clientGLobal"];
+	}
+	function select_clientglobal()
+	{
+		$option = "";
+		$res = $this->data->select_client_all();
+		foreach ($res as $v) {
+			if($v["clientid"] == $_SESSION["clientid"]){
+				$option .= "<option value='" . $v["clientid"] . "'  selected>" . $v["clientname"] . "</option>";
+			}else{
+				$option .= "<option value='" . $v["clientid"] . "'>" . $v["clientname"] . "</option>";
+			}
+		}
+		echo $option;
 	}
 	function change_password() {
 		$post = $this->security->xss_clean($this->input->post());
@@ -97,6 +154,68 @@ class Page extends CI_Controller
 			echo 'available';
 		}
 	}
+	function select_bas_progress(){
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		if (isset($post["client"])) {
+			if ($post["client"] == 'LOADING...') {
+				$client = "%%";
+			} else {
+				$client = $post["client"];
+			}
+		}
+		$option = "";
+		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
+		$last_date = date("Y-m-t", $date);
+		$last_day = date('d', strtotime($last_date));
+		for($d = 1; $d <= $last_day; $d ++){
+			$option .= "<option value='" . $d . "'>" . sprintf('%02d',$d) . "</option>";
+		}
+		$data["fileday"] = $option;
+		$data["progress"] = $this->data->select_bas_progress($post["filemonth"], $post["fileyear"], $client);
+		$data["filemonth"] = $post["filemonth"];
+		$this->load->view("home_table", $data);
+	}
+	function select_due(){
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		$data = $this->data->select_due($post["filemonth"], $post["fileyear"], $client);
+		echo json_encode($data);
+	}
+	function save_due(){
+		$post = $this->security->xss_clean($this->input->post());
+		if ($post["filemonth"] == 'LOADING...') {
+			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$post["filemonth"] = $dateObj->format('F');
+		}
+		if ($post["fileyear"] == 'LOADING...') {
+			$post["fileyear"] = date('Y');
+		}
+		$this->data->save_due(
+			$post["filemonth"],
+			$post["fileyear"],
+			$post["data_request"],
+			$post["data_upload"],
+			$post["bas_preparation"],
+			$post["bas_review"],
+			$post["bas_sign_off"],
+			$post["bas_lodgement"]
+		);
+	}
 	function select_account_list()
 	{
 		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
@@ -117,10 +236,16 @@ class Page extends CI_Controller
 		}
 		//$post = $this->security->xss_clean($this->input->post());
 	}
+	function select_audittrail()
+	{
+		//$post = $this->security->xss_clean($this->input->post());
+		$data["audit"] = $this->data->select_audittrail();
+		$this->load->view("audittrail_table", $data);
+	}
 	function select_filezone()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
+		$client = $_SESSION["clientid"];
 		$entity = "";
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
@@ -129,13 +254,6 @@ class Page extends CI_Controller
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
 		}
-		if (isset($post["client"])) {
-			if ($post["client"] == 'LOADING...') {
-				$client = "%%";
-			} else {
-				$client = $post["client"];
-			}
-		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
 				$entity = "";
@@ -143,16 +261,18 @@ class Page extends CI_Controller
 				$entity = $post["entity"];
 			}
 		}
-		if($_SESSION["position"] == "client"){
-			$client = $_SESSION["clientid"];
-		}
 		$data["filezone"] = $this->data->select_filezone($post["filemonth"], $post["fileyear"], $client, $entity);
-		$this->load->view("filezone_table", $data);
+		if($_SESSION["activepage"] == "FILEZONE"){
+			$this->load->view("filezone_table", $data);
+		}
+		if($_SESSION["activepage"] == "SOURCEDATA"){
+			$this->load->view("sourcedata_table", $data);
+		}
 	}
 	function select_filereview()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
+		$client = $_SESSION["clientid"];
 		$entity = "";
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
@@ -161,13 +281,6 @@ class Page extends CI_Controller
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
 		}
-		if (isset($post["client"])) {
-			if ($post["client"] == 'LOADING...') {
-				$client = "%%";
-			} else {
-				$client = $post["client"];
-			}
-		}
 		if (isset($post["entity"])) {
 			if ($post["entity"] == 'LOADING...') {
 				$entity = "";
@@ -175,21 +288,18 @@ class Page extends CI_Controller
 				$entity = $post["entity"];
 			}
 		}
-		if($_SESSION["position"] == "client"){
-			$client = $_SESSION["clientid"];
-		}
 		$data["filereview"] = $this->data->select_filereview($post["filemonth"], $post["fileyear"], $client, $entity);
-		$this->load->view("filereview_table", $data);
+		if($_SESSION["activepage"] == "FILEZONE"){
+			$this->load->view("filereview_table", $data);
+		}
+		if($_SESSION["activepage"] == "BASHISTORY"){
+			$this->load->view("bashistory_table", $data);
+		}
 	}
 	function select_filelist()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["clientid"])) {
-			$client = $post["clientid"];
-		}else{
-			$client = $_SESSION["clientid"];
-		}
+		$client = $_SESSION["clientid"];
 		$data["filezone"] = $this->data->select_filelist($post["filemonth"], $post["fileyear"], $client, $post["entity"], $post["filecategory"]);
 		$data["fileaudit"] = $this->data->select_fileaudittrail($post["filemonth"], $post["fileyear"], $client, $post["entity"]);
 		$data["filecategory"] = $post["filecategory"];
@@ -226,6 +336,39 @@ class Page extends CI_Controller
 		echo $option;
 	}
 	function select_year()
+	{
+		$option = "";
+		$year = date('Y');
+		for ($x = 1; $x <= 5; $x++) {
+			$option .= "<option value='" . $year . "'>" . $year . "</option>";
+			$year = $year - 1;
+		}
+		echo $option;
+	}
+	function select_month_home()
+	{
+		$option = "";
+		$month = date('m');
+		for ($x = 1; $x <= 12; $x++) {
+			$dateObj = DateTime::createFromFormat('!m', $x);
+			$monthName = $dateObj->format('F');
+			$monthNameLess = "";
+			if($x == 1){
+				$dateObj = DateTime::createFromFormat('!m', 12);
+				$monthNameLess = $dateObj->format('F');
+			}else{
+				$dateObj = DateTime::createFromFormat('!m', $x - 1);
+				$monthNameLess = $dateObj->format('F');
+			}
+			if ($month == $x) {
+				$option .= "<option value='" . $monthName . "' selected>" . strtoupper($monthNameLess) . "</option>";
+			} else {
+				$option .= "<option value='" . $monthName . "'>" . strtoupper($monthNameLess) . "</option>";
+			}
+		}
+		echo $option;
+	}
+	function select_year_home()
 	{
 		$option = "";
 		$year = date('Y');
@@ -277,13 +420,7 @@ class Page extends CI_Controller
 	}
 	function select_entity()
 	{
-		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["id"])) {
-			$client = $post["id"];
-		} else {
-			$client = $_SESSION["clientid"];
-		}
+		$client = $_SESSION["clientid"];
 		$option = "";
 		$res = $this->data->select_entity($client);
 		if ($_SESSION["position"] != "client") {
@@ -313,7 +450,7 @@ class Page extends CI_Controller
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$option = "";
-		$res = $this->data->select_entity_staff($post["fileMonth"], $post["fileYear"], $post["clientid"], $post["trailstatus"]);
+		$res = $this->data->select_entity_staff($post["fileMonth"], $post["fileYear"], $_SESSION["clientid"], $post["trailstatus"]);
 		$option .= "<option value=''>Select Entity</option>";
 		foreach ($res as $v) {
 			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
@@ -323,7 +460,7 @@ class Page extends CI_Controller
 	function select_entity_list()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$data["entity"] = $this->data->select_entity($post["clientid"]);
+		$data["entity"] = $this->data->select_entity_all($post["clientid"]);
 		$this->load->view("maintenance/entity_table", $data);
 	}
 	function select_access_list()
@@ -351,12 +488,13 @@ class Page extends CI_Controller
 	function insert_account(){
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
 		$emailcode = substr(str_shuffle($permitted_chars), 0, 30);
+		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
 		$post = $this->security->xss_clean($this->input->post());
         $to = $post["email"];
-        $subject = 'BTGI Plus Email Verification';
+        $subject = 'BTGI Plus Account Reset Password (New User)';
 		$data["emailcode"] = $emailcode;
-        $message = $this->load->view('mail_template/email_verification',$data,true);
-        $from = $this->config->item('smtp_user');
+		$uname = $post["username"];
+		$upass = $genpassword;
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_account(
 			$post["username"],
@@ -366,17 +504,24 @@ class Page extends CI_Controller
 			$post["clientid"],
 			$data["emailcode"]
 		);
-        $this->email->set_newline("\r\n");
-        $this->email->from($from);
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-
-        if ($this->email->send()) {
-            echo 'Your Email has successfully been sent.';
-        } else {
-            show_error($this->email->print_debugger());
-        }
+		$this->data->reset_account($post["username"], $genpassword);
+		$myScript = APPPATH . 'py\email_reset_password.py';
+		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$this->data->insert_trail($output);
+	}
+	function reset_account()
+	{
+		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
+		$post = $this->security->xss_clean($this->input->post());
+        $to = $post["email"];
+        $subject = 'BTGI Plus Account Reset Password';
+		$uname = $post["username"];
+		$upass = $genpassword;
+		$this->data->reset_account($post["username"], $genpassword);
+		$myScript = APPPATH . 'py\email_reset_password.py';
+		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$this->data->insert_trail($output);
 	}
 	function update_account()
 	{
@@ -437,13 +582,7 @@ class Page extends CI_Controller
 	{
 		//($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 		$post = $this->security->xss_clean($this->input->post());
-		$client = "";
-		if (isset($post["clientid"])) {
-			$client = $post["clientid"];
-		}else{
-			$client = $_SESSION["clientid"];
-		}
-
+		$client = $_SESSION["clientid"];
 		$this->data->insert_fileaudittrail(
 			$client,
 			$post["fileEntity"],
@@ -459,20 +598,10 @@ class Page extends CI_Controller
 			$data["entityname"] = $post["fileEntity"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_client_confirm',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_client_confirm.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Approved'){
 			$data = $this->data->select_email_recipient('reviewer', $client, $post["fileEntity"]);
@@ -480,20 +609,10 @@ class Page extends CI_Controller
 			$data["entityname"] = $post["fileEntity"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_staff_confirm',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_staff_confirm.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Reviewed'){
 			$data = $this->data->select_email_recipient('client', $client, '');
@@ -503,43 +622,21 @@ class Page extends CI_Controller
 			$data["year"] = $post["fileYear"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_reviewer_approve',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_reviewer_approve.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -bm "'.$data["month"].'" -by "'.$data["year"].'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'ConfirmedBAS'){
 			$data = $this->data->select_email_recipient('staff', $client, $post["fileEntity"]);
 			$data["clientdetail"] = $this->data->get_client($client);
 			$data["entityname"] = $post["fileEntity"];
-			$data["month"] = $post["fileMonth"];
-			$data["year"] = $post["fileYear"];
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
-			$message = $this->load->view('mail_template/email_client_approve',$data,true);
-			$from = $this->config->item('smtp_user');
 
-			$this->email->set_newline("\r\n");
-			$this->email->from($from);
-			$this->email->to($to);
-			$this->email->subject($subject);
-			$this->email->message($message);
-
-			if ($this->email->send()) {
-				echo 'Your Email has successfully been sent.';
-			} else {
-				show_error($this->email->print_debugger());
-			}
+			$myScript = APPPATH . 'py\email_client_approve.py';
+			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$this->data->insert_trail($output);
 		}
 	}
 	function insert_file()
@@ -559,7 +656,7 @@ class Page extends CI_Controller
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->insert_filereview(
 			$post["fileName"],
-			$post["clientid"],
+			$_SESSION["clientid"],
 			$post["fileMonth"],
 			$post["fileYear"],
 			$post["fileEntity"]
@@ -577,10 +674,7 @@ class Page extends CI_Controller
 			$post["fileYear"],
 			$post["fileEntity"]
 		);
-		$data = $this->data->deny_filehistory($post["fileid"]);
-		if (!empty($data)) {
-			$this->data->insert_history("Updated", $post["fileid"], "");
-		}
+		$this->data->insert_history("Updated", $post["fileid"], "");
 	}
 	function update_filereview()
 	{
@@ -588,7 +682,7 @@ class Page extends CI_Controller
 		$this->data->update_filereview(
 			$post["fileid"],
 			$post["fileName"],
-			$post["clientid"],
+			$_SESSION["clientid"],
 			$post["fileMonth"],
 			$post["fileYear"],
 			$post["fileEntity"]
@@ -628,39 +722,14 @@ class Page extends CI_Controller
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->active_client($post["clientid"], $post["active"]);
 	}
-	function reset_account()
-	{
-		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-		$genpassword = substr(str_shuffle($permitted_chars), 0, 10);
-		$post = $this->security->xss_clean($this->input->post());
-        $to = $post["email"];
-        $subject = 'BTGI Plus Account Reset Password';
-		$data["username"] = $post["username"];
-		$data["password"] = $genpassword;
-        $message = $this->load->view('mail_template/reset_password_template',$data,true);
-        $from = $this->config->item('smtp_user');
-		$this->data->reset_account($post["username"], $genpassword);
-
-        $this->email->set_newline("\r\n");
-        $this->email->from($from);
-        $this->email->to($to);
-        $this->email->subject($subject);
-        $this->email->message($message);
-
-        if ($this->email->send()) {
-            echo 'Your Email has successfully been sent.';
-        } else {
-            show_error($this->email->print_debugger());
-        }
-	}
 	function upload_file()
 	{
 		$get = $this->security->xss_clean($this->input->get());
-		if (!is_dir('assets/files/' . $_SESSION["username"] . '/' . $get["entity"])) {
-			mkdir('./assets/files/' . $_SESSION["username"] . '/' . $get["entity"], 0777, true);
+		if (!is_dir('assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
+			mkdir('./assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
 			$dir_exist = false; // dir not exist
 		}
-		$config['upload_path'] = 'assets/files/' . $_SESSION["username"] . '/' . $get["entity"] . '/';
+		$config['upload_path'] = 'assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
 		$config['max_size'] = 20000000;
@@ -672,11 +741,11 @@ class Page extends CI_Controller
 	function upload_file_review()
 	{
 		$get = $this->security->xss_clean($this->input->get());
-		if (!is_dir('assets/files/' . $get["clientid"] . '/' . $get["entity"])) {
-			mkdir('./assets/files/' . $get["clientid"] . '/' . $get["entity"], 0777, true);
+		if (!is_dir('assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
+			mkdir('./assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
 			$dir_exist = false; // dir not exist
 		}
-		$config['upload_path'] = 'assets/files/' . $get["clientid"] . '/' . $get["entity"] . '/';
+		$config['upload_path'] = 'assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
 		$config['max_size'] = 20000000;

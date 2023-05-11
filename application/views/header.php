@@ -43,7 +43,7 @@
                             <i class="ni ni-single-02"></i>
                             <span>My profile</span>
                         </a>
-                        <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
+                        <?php if($_SESSION["position"] == "admin"){ ?>
                             <a href="accounts" class="dropdown-item">
                                 <i class="ni ni-single-02"></i>
                                 <span>Accounts</span>
@@ -52,11 +52,13 @@
                                 <i class="ni ni-single-02"></i>
                                 <span>Clients</span>
                             </a>
-                        <?php } ?>
-                        <?php if($_SESSION["position"] == "admin"){ ?>
                             <a href="maintenance" class="dropdown-item">
                                 <i class="ni ni-single-02"></i>
                                 <span>Maintenance</span>
+                            </a>
+                            <a href="audittrail" class="dropdown-item">
+                                <i class="ni ni-single-02"></i>
+                                <span>Audit Trail</span>
                             </a>
                         <?php } ?>
                         <div class="dropdown-divider"></div>

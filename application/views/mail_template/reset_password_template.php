@@ -1,13 +1,17 @@
-<table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr>
-        <td align="center" valign="top" style="padding: 20px 0;">
-            <img src="https://example.com/logo.png" alt="Company Logo" width="150">
-        </td>
-    </tr>
-    <tr>
-        <td align="center" valign="top" style="padding: 40px 20px;">
-            <h1 style="font-size: 36px; margin: 0; color: #333;">Username: </b> <?php echo $username ?></h1>
-            <h1 style="font-size: 36px; margin: 0; color: #333;">Password: </b> <?php echo $password ?></h1>
-        </td>
-    </tr>
-</table>
+<div style=" font-weight: bold;">
+    <h1>Hi, User</h1>
+</div>
+<hr>
+<div style=" font-weight: bold;">
+    <h5>There was a request to change your password!</h5>
+    <h5>Below is your temporary username and password</h5>
+</div>
+<hr>
+<div style=" font-weight: bold;">
+    <h3>Username: <?php echo $username ?></h3>
+    <h3>Password: <?php echo $password ?></h3>
+</div>
+<br>
+<div>
+    <a href="<?php echo base_url(); ?>index.php/Login/login_screen" class="btn btn-primary my-4">Log In</a>
+</div>

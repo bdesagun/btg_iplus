@@ -26,6 +26,8 @@
 <script src="<?php echo base_url(); ?>assets/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/vendor/bootstrap-notify/bootstrap-notify.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/moment/min/moment.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/vendor/fullcalendar/dist/fullcalendar.min.js"></script>
 <!-- Argon JS -->
 <script src="<?php echo base_url(); ?>assets/js/argon.js?v=1.1.0"></script>
 <!-- Demo JS - remove this in your project -->

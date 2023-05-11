@@ -31,7 +31,7 @@
         <!-- Page content -->
 
         <div class="container-fluid mt--6">
-            <div class="row justify-content-center">
+            <!-- <div class="row justify-content-center">
                 <div class="col-lg-8 card-wrapper">
                     <div class="card">
                         <div class="card-body">
@@ -46,11 +46,109 @@
                         </div>
                     </div>
                 </div>
+            </div> -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <!-- Card header -->
+                        <div class="card-header">
+                            <div class="row">
+                                <?php if($_SESSION["position"] != "client"){ ?>
+                                    <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
+                                    <div class="col-md-2">
+                                            <select class="form-control" id="selectClient" onchange="loadHome()"></select>
+                                    </div>
+                                <?php }else{ ?><div class="col-md-3"></div><?php } ?>
+                                <label for="example-text-input" class="col-md-5 col-form-label form-control-label text-right">GST Filing Period:</label>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="selectMonth" onchange="loadHome()"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-control" id="selectYear" onchange="loadHome()"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive py-4"  id="div_home_table"></div>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
     <?php require "js.php"; ?>
 </body>
 
+<script>
+    getClient();
+    GetMonth();
+    GetYear();
+    loadHome();
+    function loadHome(){
+        $("#div_home_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            filemonth   : $("#selectMonth").val(),
+            fileyear    : $("#selectYear").val(),
+            client      : $("#selectClient").val(),
+        };
+        $.post("select_bas_progress", params).done(function(data) {
+            $("#div_home_table").html(data);
+            $.post("select_due", params).done(function(data) {
+                var due = JSON.parse(data);
+                if (due){
+                    $("#data_request").val(due.data_request);
+                    $("#data_upload").val(due.data_upload);
+                    $("#bas_preparation").val(due.bas_preparation);
+                    $("#bas_review").val(due.bas_review);
+                    $("#bas_sign_off").val(due.bas_sign_off);
+                    $("#bas_lodgement").val(due.bas_lodgement);
+                }
+            });
+        });
+    }
+    function getClient(){
+        $("#selectClient").prop('disabled', true);
+        $('#selectClient')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_client").done(function(data) {
+            $("#selectClient").html(data);
+            $("#selectClient").prop('disabled', false);
+        });
+    }
+    function GetMonth(){
+        $("#selectMonth").prop('disabled', true);
+        $('#selectMonth')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_month_home").done(function(data) {
+            $("#selectMonth").html(data);
+            $("#selectMonth").prop('disabled', false);
+        });
+    }
+    function GetYear(){
+        $("#selectYear").prop('disabled', true);
+        $('#selectYear')
+            .empty()
+            .append('<option>LOADING...</option>');
+        $.post("select_year_home").done(function(data) {
+            $("#selectYear").html(data);
+            $("#selectYear").prop('disabled', false);
+        });
+    }
+    function saveDue(){
+        var params;
+        params = {
+            filemonth       : $("#selectMonth").val(),
+            fileyear        : $("#selectYear").val(),
+            data_request    : $("#data_request").val(),
+            data_upload     : $("#data_upload").val(),
+            bas_preparation : $("#bas_preparation").val(),
+            bas_review      : $("#bas_review").val(),
+            bas_sign_off    : $("#bas_sign_off").val(),
+            bas_lodgement   : $("#bas_lodgement").val(),
+        };
+        $.post("save_due",params).done(function(data) {
+            loadHome();
+        });
+    }
+</script>
 </html>

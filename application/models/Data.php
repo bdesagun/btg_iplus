@@ -143,6 +143,68 @@ class Data extends CI_Model {
 				checklist";
 		return $this->db->query($q)->result_array();
 	}
+	public function select_audittrail()
+	{
+		$q = "SELECT * FROM audittrail ORDER BY updateddate DESC";
+		return $this->db->query($q)->result_array();
+	}
+	public function select_bas_progress($filemonth, $fileyear, $client)
+	{
+		$filter = "AND b.subcategory =".$_SESSION["clientid"];
+		if($client == 'ALL'){
+			$client = '%%';
+		}
+		if($_SESSION["position"] != "client"){
+			$filter = "AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")";
+		}
+		$q = "SELECT
+			d.clientname,
+			b.value,
+			((COUNT(a.entity) * 17) + 10) AS progress,
+            CASE
+            	WHEN COUNT(a.entity) = 1 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', data_upload, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 2 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 3 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_review, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 4 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+			END AS 'barcolor'
+		FROM dropdown b
+		LEFT JOIN clients d ON b.subcategory = d.clientid
+		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value
+        	AND a.month = (SELECT x.month FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
+            AND a.year = (SELECT x.year FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
+        LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
+		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
+		".$filter."
+		GROUP BY b.value
+        ORDER BY d.clientname";
+		$params = array($client);
+		return $this->db->query($q,$params)->result_array();
+	}
+	public function select_due($filemonth, $fileyear, $client)
+	{
+		$q = "SELECT * FROM filedue a WHERE
+			month = (SELECT x.month FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)
+			AND year = (SELECT x.year FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)
+			AND a.clientid = ?";
+		$params = array($client, $client, $client);
+		return $this->db->query($q,$params)->row_array();
+	}
+	public function save_due($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement)
+	{
+		//SELECT MONTH(STR_TO_DATE('April 3, 2023', '%M %d, %Y'));
+		//SELECT STR_TO_DATE('April 3, 2023', '%M %d, %Y');
+		$q = "DELETE FROM filedue WHERE clientid IN (".$_SESSION["clientaccess"].") AND month = ? AND year = ?";
+		$params = array($filemonth, $fileyear);
+		$this->db->query($q, $params);
+		//$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
+		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement)
+				SELECT clientid, ? AS month, ? AS year, ? AS data_request, ? AS data_upload, ? AS bas_preparation, ? AS bas_review, ? AS bas_sign_off, ? AS bas_lodgement
+				FROM clients WHERE clientid IN (".$_SESSION["clientaccess"].")";
+		$params = array($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
+		$this->db->query($q, $params);
+
+		$this->data->insert_trail("Update schedule in home page. Month: ".$filemonth.", Year: ".$fileyear);
+	}
 	public function select_filelist($filemonth, $fileyear, $client, $entity, $filecategory)
 	{
 		$q = "SELECT
@@ -356,7 +418,8 @@ class Data extends CI_Model {
 	}
 	public function select_filehistory($fileid)
 	{
-		$q = "SELECT * FROM filehistory WHERE fileid=?";
+		$q = "SELECT a.*, b.accountname FROM filehistory a
+			LEFT JOIN useraccount b ON a.updatedby = b.username WHERE a.fileid=?";
 		$params = array($fileid);
 		return $this->db->query($q,$params)->result_array();
 	}
@@ -452,7 +515,7 @@ class Data extends CI_Model {
 		if($entity == 'ALL'){
 			$entity = '%%';
 		}
-		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
+		$q = "DELETE FROM userentity WHERE clientid LIKE ? AND entity LIKE ? AND username=?";
 		$params = array($clientid, $entity, $username);
 		$this->db->query($q, $params);
 		$q = "INSERT INTO userentity(clientid, entity, username, active)
@@ -569,6 +632,13 @@ class Data extends CI_Model {
 		$q = "SELECT * FROM filehistory WHERE filestatus='Returned' AND fileid=?";
 		$params = array($fileid);
 		return $this->db->query($q, $params)->result_array();
+	}
+	public function insert_trail($activiy)
+	{
+		$q = "INSERT INTO audittrail(activity, updatedby, updateddate)
+					VALUES(?, ?, current_timestamp)";
+		$params = array($activiy, $_SESSION["username"]);
+		$this->db->query($q, $params);
 	}
 	// public function select_session($referral_id){
 	// 	$q="SELECT * FROM tbl_session WHERE referral_id=?";
