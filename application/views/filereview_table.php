@@ -32,6 +32,9 @@
                                     Delete
                                 </button>
                             <?php } ?>
+                            <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalHistory" onclick="historyFile(<?php echo $row['fileid']; ?>)">
+                                History
+                            </button>
                         </td>
                     <?php } ?>
                 </tr>

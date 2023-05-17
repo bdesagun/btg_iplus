@@ -506,7 +506,7 @@ class Page extends CI_Controller
 		);
 		$this->data->reset_account($post["username"], $genpassword);
 		$myScript = APPPATH . 'py\email_reset_password.py';
-		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
 		$this->data->insert_trail($output);
 	}
 	function reset_account()
@@ -520,7 +520,7 @@ class Page extends CI_Controller
 		$upass = $genpassword;
 		$this->data->reset_account($post["username"], $genpassword);
 		$myScript = APPPATH . 'py\email_reset_password.py';
-		$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
+		$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
 		$this->data->insert_trail($output);
 	}
 	function update_account()
@@ -600,7 +600,7 @@ class Page extends CI_Controller
 			$subject = 'BTGI Plus Notification';
 
 			$myScript = APPPATH . 'py\email_client_confirm.py';
-			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Approved'){
@@ -611,7 +611,7 @@ class Page extends CI_Controller
 			$subject = 'BTGI Plus Notification';
 
 			$myScript = APPPATH . 'py\email_staff_confirm.py';
-			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'Reviewed'){
@@ -624,7 +624,7 @@ class Page extends CI_Controller
 			$subject = 'BTGI Plus Notification';
 
 			$myScript = APPPATH . 'py\email_reviewer_approve.py';
-			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -bm "'.$data["month"].'" -by "'.$data["year"].'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
+			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -bm "'.$data["month"].'" -by "'.$data["year"].'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
 		if($post["trailstatus"] == 'ConfirmedBAS'){
@@ -635,7 +635,7 @@ class Page extends CI_Controller
 			$subject = 'BTGI Plus Notification';
 
 			$myScript = APPPATH . 'py\email_client_approve.py';
-			$output = shell_exec('python '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
+			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
 	}

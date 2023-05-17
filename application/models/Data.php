@@ -64,7 +64,7 @@ class Data extends CI_Model {
 	public function change_password($username, $password)
 	{
 		$pmd5 = md5($password);
-		$q = "UPDATE useraccount SET password=? WHERE username=?";
+		$q = "UPDATE useraccount SET password=?, active=1 WHERE username=?";
 		$params = array($pmd5, $username);
 		$this->db->query($q, $params);
 	}
@@ -72,7 +72,7 @@ class Data extends CI_Model {
 	{
 		// 1 - Active
 		// 0 - Inactive
-		// 2 - New
+		// 2 - Pending Reset Password
 		// 3 - Email Verified
 		$q = "SELECT
 				u.username,
@@ -84,7 +84,7 @@ class Data extends CI_Model {
 					WHEN u.active = 1 THEN 'Active'
 					WHEN u.active = 0 THEN 'Inactive'
 					WHEN u.active = 3 THEN 'Email Verified'
-					ELSE 'New'
+					ELSE 'Pending Reset Password'
 				END AS 'Status',
 				u.active
 			FROM
@@ -596,7 +596,7 @@ class Data extends CI_Model {
 	public function reset_account($username, $genpassword)
 	{
 		$pmd5 = md5($genpassword);
-		$q = "UPDATE useraccount SET password=?, active=1 WHERE username=?";
+		$q = "UPDATE useraccount SET password=? WHERE username=?";
 		$params = array($pmd5, $username);
 		$this->db->query($q, $params);
 	}
