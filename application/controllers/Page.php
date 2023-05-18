@@ -505,7 +505,7 @@ class Page extends CI_Controller
 			$data["emailcode"]
 		);
 		$this->data->reset_account($post["username"], $genpassword);
-		$myScript = APPPATH . 'py\email_reset_password.py';
+		$myScript = APPPATH . 'py/email_reset_password.py';
 		$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
 		$this->data->insert_trail($output);
 	}
@@ -521,7 +521,7 @@ class Page extends CI_Controller
 		$this->data->reset_account($post["username"], $genpassword);
 		$myScript = APPPATH . 'py/email_reset_password.py';
 		$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
-		$this->data->insert_trail($myScript);
+		$this->data->insert_trail($output);
 	}
 	function update_account()
 	{
@@ -599,7 +599,7 @@ class Page extends CI_Controller
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
 
-			$myScript = APPPATH . 'py\email_client_confirm.py';
+			$myScript = APPPATH . 'py/email_client_confirm.py';
 			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
@@ -610,7 +610,7 @@ class Page extends CI_Controller
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
 
-			$myScript = APPPATH . 'py\email_staff_confirm.py';
+			$myScript = APPPATH . 'py/email_staff_confirm.py';
 			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
@@ -623,7 +623,7 @@ class Page extends CI_Controller
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
 
-			$myScript = APPPATH . 'py\email_reviewer_approve.py';
+			$myScript = APPPATH . 'py/email_reviewer_approve.py';
 			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -bm "'.$data["month"].'" -by "'.$data["year"].'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
@@ -634,7 +634,7 @@ class Page extends CI_Controller
 			$to = $data["emails"];
 			$subject = 'BTGI Plus Notification';
 
-			$myScript = APPPATH . 'py\email_client_approve.py';
+			$myScript = APPPATH . 'py/email_client_approve.py';
 			$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -cn "'.$data["clientdetail"]["clientname"].'" -en "'.$data["entityname"].'" -an "'.$_SESSION["accountname"].' - '.date('m/d/Y h:i:s', time()).'" -l "'.base_url().'index.php/Login/login_screen"');
 			$this->data->insert_trail($output);
 		}
