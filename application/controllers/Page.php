@@ -521,7 +521,7 @@ class Page extends CI_Controller
 		$this->data->reset_account($post["username"], $genpassword);
 		$myScript = APPPATH . 'py\email_reset_password.py';
 		$output = shell_exec('python3 '.$myScript.' -r "'.$to.'" -s "'.$subject.'" -un "'.$uname.'" -up "'.$upass.'" -l "'.base_url().'index.php/Login/login_screen"');
-		$this->data->insert_trail($output);
+		$this->data->insert_trail($myScript);
 	}
 	function update_account()
 	{
