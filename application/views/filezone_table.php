@@ -25,7 +25,7 @@
                     <td><i class="ni ni-tag text-<?php echo $row['filecolor']; ?>"></i><?php echo " ".$row['filestatus']; ?>   </td>
                     <td><?php echo $row['filedate']; ?></td>
                     <td>
-                        <?php if(($_SESSION["position"] == "client" || $_SESSION["position"] == "admin") && $row['trailstatus'] != "Confirmed"){ ?>
+                        <?php if(($_SESSION["position"] == "client" || $_SESSION["position"] == "admin") && $row['trailstatus'] != "Confirmed" && $row['filestatus'] != "Returned"){ ?>
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalFilezone" onclick="editFile(<?php echo $row['fileid']; ?>)">
                                 Edit
                             </button>
