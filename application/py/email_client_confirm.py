@@ -33,7 +33,7 @@ def send_email_fp(sender,recipient,subject,password,clientname,entityname,accoun
                                         <tr>
                                             <td style="text-align:center;">
                                               <a href="https://btgi.com.au" title="logo" target="_blank">
-                                                <img width="150px" src="https://btgi.com.au/wp-content/uploads/2022/01/Btg-Logo-High-Resolution-03.png" title="logo" alt="logo">
+                                                <img width="100" src="https://btgi.com.au/wp-content/uploads/2022/01/Btg-Logo-High-Resolution-03.png" title="logo" alt="logo">
                                               </a>
                                             </td>
                                         </tr>
