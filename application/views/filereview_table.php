@@ -7,7 +7,7 @@
             <?php } ?>
             <th>Entity</th>
             <th>Last Updated</th>
-            <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin")){ ?>
+            <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin")){ ?>
                 <th style="width:20%">Action</th>
             <?php } ?>
         </tr>
@@ -22,8 +22,8 @@
                     <?php } ?>
                     <td><?php echo $row['fileentity']; ?></td>
                     <td><?php echo $row['filedate']; ?></td>
-                    <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
-                        <td>
+                    <td>
+                        <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
                             <?php if($row['trailstatus'] != 'Reviewed' && $row['trailstatus'] != 'Finalized'){ ?>
                                 <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalFilereview" onclick="editFileReview(<?php echo $row['fileid']; ?>)">
                                     Edit
@@ -32,11 +32,11 @@
                                     Delete
                                 </button>
                             <?php } ?>
-                            <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalHistory" onclick="historyFile(<?php echo $row['fileid']; ?>)">
-                                History
-                            </button>
-                        </td>
-                    <?php } ?>
+                        <?php } ?>
+                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalHistory" onclick="historyFile(<?php echo $row['fileid']; ?>)">
+                            History
+                        </button>
+                    </td>
                 </tr>
             <?php } ?>
         <?php } ?>
