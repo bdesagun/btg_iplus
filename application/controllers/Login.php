@@ -21,7 +21,7 @@ class Login extends CI_Controller {
 		$post = $this->security->xss_clean($this->input->post());
 		$data = $this->data->select_account($post["username"],$post["password"]);
 		if (!empty($data)) {
-			if($data["active"] == '1' || $data["active"] == '2'){
+			if($data["active"] == '1' || ($data["active"] == '2' && $data["account_status"] == 'Pending')){
 				$_SESSION["accountname"] = $data["accountname"];
 				$_SESSION["username"] = $data["username"];
 				$_SESSION["position"] = $data["position"];

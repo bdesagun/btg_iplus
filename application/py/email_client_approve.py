@@ -98,7 +98,7 @@ def send_email_fp(sender,recipient,subject,password,clientname,entityname,accoun
         # if tls = True
         mail.starttls()
         mail.login(sender, password)
-        mail.sendmail(sender, recipient, msg.as_string())
+        mail.sendmail(sender, [i for i in recipient.split(",")], msg.as_string())
         mail.quit()
 
     except Exception as e:

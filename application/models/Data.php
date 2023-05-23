@@ -15,7 +15,10 @@ class Data extends CI_Model {
 				u.*,
 				c.clientname,
 				(SELECT GROUP_CONCAT(clientid) AS emails FROM userentity WHERE username = ?) AS clientaccess,
-				(SELECT GROUP_CONCAT(CONCAT('''', entity, '''' )) AS emails FROM userentity WHERE username = ?) AS entityaccess
+				(SELECT GROUP_CONCAT(CONCAT('''', entity, '''' )) AS emails FROM userentity WHERE username = ?) AS entityaccess,
+				CASE WHEN u.active = 2 THEN
+					CASE WHEN u.added_date < DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) THEN 'Expired' ELSE 'Pending' END
+				END AS account_status
 			FROM
 				useraccount u
 			LEFT JOIN clients c ON u.clientid=c.clientid
@@ -84,7 +87,7 @@ class Data extends CI_Model {
 					WHEN u.active = 1 THEN 'Active'
 					WHEN u.active = 0 THEN 'Inactive'
 					WHEN u.active = 3 THEN 'Email Verified'
-					ELSE 'Pending Reset Password'
+					ELSE CASE WHEN added_date < DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) THEN 'Account Expired' ELSE 'Pending Reset Password' END
 				END AS 'Status',
 				u.active
 			FROM
@@ -485,7 +488,7 @@ class Data extends CI_Model {
 	}
 	public function insert_account($username, $accountname, $email, $position, $clientid, $emailcode)
 	{
-		$q = "INSERT INTO useraccount(username, accountname, email, position, clientid, emailcode, active) VALUES(?,?,?,?,?,?,'2')";
+		$q = "INSERT INTO useraccount(username, accountname, email, position, clientid, emailcode, active, added_date) VALUES(?,?,?,?,?,?,'2', CURRENT_DATE())";
 		$params = array($username, $accountname, $email, $position, $clientid, $emailcode);
 		$this->db->query($q, $params);
 	}
