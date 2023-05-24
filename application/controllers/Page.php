@@ -159,6 +159,7 @@ class Page extends CI_Controller
 		$client = $_SESSION["clientid"];
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
+			$dateObj->sub(new DateInterval('P1M'));
 			$post["filemonth"] = $dateObj->format('F');
 		}
 		if ($post["fileyear"] == 'LOADING...') {
@@ -173,14 +174,18 @@ class Page extends CI_Controller
 		}
 		$option = "";
 		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
+		//$date = date("Y-m-t", strtotime($date. '+1 months'));
+		$newmonth = strtotime('+1 month', $date);
+		$newmonth = DateTime::createFromFormat('!m', date('m', $newmonth));
 		$last_date = date("Y-m-t", $date);
 		$last_day = date('d', strtotime($last_date));
 		for($d = 1; $d <= $last_day; $d ++){
 			$option .= "<option value='" . $d . "'>" . sprintf('%02d',$d) . "</option>";
 		}
 		$data["fileday"] = $option;
+		$dateObj = DateTime::createFromFormat('!m', date('m', strtotime($date)));
 		$data["progress"] = $this->data->select_bas_progress($post["filemonth"], $post["fileyear"], $client);
-		$data["filemonth"] = $post["filemonth"];
+		$data["filemonth"] = $newmonth->format('F');
 		$this->load->view("home_table", $data);
 	}
 	function select_due(){
@@ -352,18 +357,10 @@ class Page extends CI_Controller
 		for ($x = 1; $x <= 12; $x++) {
 			$dateObj = DateTime::createFromFormat('!m', $x);
 			$monthName = $dateObj->format('F');
-			$monthNameLess = "";
-			if($x == 1){
-				$dateObj = DateTime::createFromFormat('!m', 12);
-				$monthNameLess = $dateObj->format('F');
-			}else{
-				$dateObj = DateTime::createFromFormat('!m', $x - 1);
-				$monthNameLess = $dateObj->format('F');
-			}
-			if ($month == $x) {
-				$option .= "<option value='" . $monthName . "' selected>" . strtoupper($monthNameLess) . "</option>";
+			if ($month == $x + 1) {
+				$option .= "<option value='" . $monthName . "' selected>" . strtoupper($monthName) . "</option>";
 			} else {
-				$option .= "<option value='" . $monthName . "'>" . strtoupper($monthNameLess) . "</option>";
+				$option .= "<option value='" . $monthName . "'>" . strtoupper($monthName) . "</option>";
 			}
 		}
 		echo $option;
