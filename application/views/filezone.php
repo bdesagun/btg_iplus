@@ -1119,8 +1119,18 @@
             contentType:false,
             cache:false,
             async:false,
-            success: function(data){
-                console.log("Upload Image Successful.");
+            beforeSend: function() {
+            // Show a loading indicator or any other UI feedback to indicate that the upload is in progress
+            },
+            success: function(response) {
+            // Handle the success response from the server
+            },
+            error: function() {
+            // Handle errors, if any
+            },
+            complete: function() {
+            // Perform any final cleanup or UI updates
+            }
         }
         });
     }
