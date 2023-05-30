@@ -1,9 +1,7 @@
 <table class="table table-flush" id="table_home_info">
     <thead class="thead-light">
         <tr>
-            <?php if($_SESSION["position"] != "client"){ ?>
-                <th>Client</th>
-            <?php } ?>
+            <th>Client</th>
             <th>Entity</th>
             <th style="width: 12%">
                 <div class="text-center">Data Request</div>
@@ -65,6 +63,7 @@
                     </div>
                 </th>
             <?php }else{ ?>
+                <th></th>
                 <th>DUE DATE</th>
                 <th style="width: 12%">
                     <div class="text-center" style=" font-weight: bold;">
