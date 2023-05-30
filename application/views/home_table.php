@@ -25,7 +25,7 @@
             </th>
         </tr>
         <tr>
-            <?php if($_SESSION["position"] != "client"){ ?>
+            <?php if($_SESSION["position"] == "reviewer"){ ?>
                 <th></th>
                 <th>DUE DATE</th>
                 <th style="width: 12%">

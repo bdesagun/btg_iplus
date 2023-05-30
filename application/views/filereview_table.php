@@ -7,9 +7,7 @@
             <?php } ?>
             <th>Entity</th>
             <th>Last Updated</th>
-            <?php if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin")){ ?>
-                <th style="width:20%">Action</th>
-            <?php } ?>
+            <th style="width:20%">Action</th>
         </tr>
     </thead>
     <tbody

@@ -176,9 +176,9 @@ class Page extends CI_Controller
 		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
 		//$date = date("Y-m-t", strtotime($date. '+1 months'));
 		$newmonth = strtotime('+1 month', $date);
-		$newmonth = DateTime::createFromFormat('!m', date('m', $newmonth));
-		$last_date = date("Y-m-t", $date);
+		$last_date = date("Y-m-t", $newmonth);
 		$last_day = date('d', strtotime($last_date));
+		$newmonth = DateTime::createFromFormat('!m', date('m', $newmonth));
 		for($d = 1; $d <= $last_day; $d ++){
 			$option .= "<option value='" . $d . "'>" . sprintf('%02d',$d) . "</option>";
 		}
