@@ -141,7 +141,7 @@
                         </div>
                     </div>`
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-default" onclick="saveFileReview()">Save</button>
+                        <button id="savefilereview" type="button" class="btn btn-outline-default" onclick="saveFileReview()">Save</button>
                         <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1000,6 +1000,8 @@
         $("#val_selectEntityReview").empty();
     });
     function saveFile(){
+        $("#savefilezone").prop('disabled', true);
+        document.getElementById('savefilezone').innerHTML = 'Uploading';
         if (testFile() == 0){
             var saveStatus = document.getElementById('filezoneLabel').innerHTML;
             var params;
@@ -1031,8 +1033,12 @@
                 });
             }
         }
+        $("#savefilezone").prop('disabled', false);
+        document.getElementById('savefilezone').innerHTML = 'Save';
     }
     function saveFileReview(){
+        $("#savefilereview").prop('disabled', true);
+        document.getElementById('savefilereview').innerHTML = 'Uploading';
         if (testFileReview() == 0){
             var saveStatus = document.getElementById('filereviewLabel').innerHTML;
             var params;
@@ -1063,6 +1069,8 @@
                 });
             }
         }
+        $("#savefilereview").prop('disabled', false);
+        document.getElementById('savefilereview').innerHTML = 'Save';
     }
     function auditFile(status){
         var filentitybas;
@@ -1119,10 +1127,7 @@
             contentType:false,
             cache:false,
             async:false,
-            beforeSend: function() {
-                $("#savefilezone").prop('disabled', true);
-                document.getElementById('savefilezone').innerHTML = 'Uploading';
-            },
+            beforeSend: function() {},
             success: function(response) {
             // Handle the success response from the server
             },
