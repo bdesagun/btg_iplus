@@ -80,7 +80,7 @@
                         </div>
                     </div>`
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-default" onclick="saveFile()">Save</button>
+                        <button id="savefilezone" type="button" class="btn btn-outline-default" onclick="saveFile()">Save</button>
                         <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -1120,7 +1120,8 @@
             cache:false,
             async:false,
             beforeSend: function() {
-            // Show a loading indicator or any other UI feedback to indicate that the upload is in progress
+                $("#savefilezone").prop('disabled', true);
+                document.getElementById('savefilezone').innerHTML = 'Uploading';
             },
             success: function(response) {
             // Handle the success response from the server
@@ -1129,7 +1130,8 @@
             // Handle errors, if any
             },
             complete: function() {
-            // Perform any final cleanup or UI updates
+                $("#savefilezone").prop('disabled', false);
+                document.getElementById('savefilezone').innerHTML = 'Save';
             }
         });
     }

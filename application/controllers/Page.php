@@ -721,6 +721,7 @@ class Page extends CI_Controller
 	}
 	function upload_file()
 	{
+		ob_start();
 		$get = $this->security->xss_clean($this->input->get());
 		if (!is_dir('assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
 			mkdir('./assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
@@ -737,6 +738,7 @@ class Page extends CI_Controller
 	}
 	function upload_file_review()
 	{
+		ob_start();
 		$get = $this->security->xss_clean($this->input->get());
 		if (!is_dir('assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"])) {
 			mkdir('./assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"], 0777, true);
