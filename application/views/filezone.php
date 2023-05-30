@@ -1131,7 +1131,6 @@
             complete: function() {
             // Perform any final cleanup or UI updates
             }
-        }
         });
     }
     function saveToFolderReview(entity, month, year){
