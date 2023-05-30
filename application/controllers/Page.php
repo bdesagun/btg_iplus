@@ -729,7 +729,7 @@ class Page extends CI_Controller
 		$config['upload_path'] = 'assets/files/client_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
-		$config['max_size'] = 20000000;
+		$config['max_size'] = 150000000;
 		$this->load->library('upload', $config);
 		$this->upload->do_upload('file_to_upload');
 		$res = $this->upload->data();
@@ -745,7 +745,7 @@ class Page extends CI_Controller
 		$config['upload_path'] = 'assets/files/btg_file/' . $_SESSION["clientid"] . '/' . $get["entity"] . '/'. $get["month"] . '/'. $get["year"] . '/';
 		$config['allowed_types'] = '*';
 		$config['overwrite'] = TRUE;
-		$config['max_size'] = 20000000;
+		$config['max_size'] = 150000000;
 		$this->load->library('upload', $config);
 		$this->upload->do_upload('file_to_upload_review');
 		$res = $this->upload->data();
