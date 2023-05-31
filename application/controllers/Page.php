@@ -156,7 +156,6 @@ class Page extends CI_Controller
 	}
 	function select_bas_progress(){
 		$post = $this->security->xss_clean($this->input->post());
-		$client = $_SESSION["clientid"];
 		if ($post["filemonth"] == 'LOADING...') {
 			$dateObj = DateTime::createFromFormat('!m', date('m'));
 			$dateObj->sub(new DateInterval('P1M'));
@@ -164,13 +163,6 @@ class Page extends CI_Controller
 		}
 		if ($post["fileyear"] == 'LOADING...') {
 			$post["fileyear"] = date('Y');
-		}
-		if (isset($post["client"])) {
-			if ($post["client"] == 'LOADING...') {
-				$client = "%%";
-			} else {
-				$client = $post["client"];
-			}
 		}
 		$option = "";
 		$date = strtotime("2nd ".$post["filemonth"]." ".$post["fileyear"]);
@@ -184,7 +176,7 @@ class Page extends CI_Controller
 		}
 		$data["fileday"] = $option;
 		$dateObj = DateTime::createFromFormat('!m', date('m', strtotime($date)));
-		$data["progress"] = $this->data->select_bas_progress($post["filemonth"], $post["fileyear"], $client);
+		$data["progress"] = $this->data->select_bas_progress($post["filemonth"], $post["fileyear"]);
 		$data["filemonth"] = $newmonth->format('F');
 		$this->load->view("home_table", $data);
 	}
