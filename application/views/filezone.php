@@ -1118,6 +1118,7 @@
         });
     }
     function saveToFolder(entity, month, year){
+        event.preventDefault();
         var formEl = document.forms.form_upload;
         $.ajax({
             url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + entity + '&month=' + month + '&year=' + year,
@@ -1128,19 +1129,13 @@
             cache:false,
             async:false,
             beforeSend: function() {},
-            success: function(response) {
-            // Handle the success response from the server
-            },
-            error: function() {
-            // Handle errors, if any
-            },
-            complete: function() {
-                $("#savefilezone").prop('disabled', false);
-                document.getElementById('savefilezone').innerHTML = 'Save';
-            }
+            success: function(response) {},
+            error: function() {},
+            complete: function() {}
         });
     }
     function saveToFolderReview(entity, month, year){
+        event.preventDefault();
         var formEl = document.forms.form_upload_review;
         $.ajax({
             url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity + '&month=' + month + '&year=' + year,
@@ -1150,9 +1145,10 @@
             contentType:false,
             cache:false,
             async:false,
-            success: function(data){
-                console.log("Upload Image Successful.");
-        }
+            beforeSend: function() {},
+            success: function(response) {},
+            error: function() {},
+            complete: function() {}
         });
     }
     $('input[type="file"]').change(function(e){
