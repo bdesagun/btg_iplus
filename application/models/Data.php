@@ -151,12 +151,9 @@ class Data extends CI_Model {
 		$q = "SELECT * FROM audittrail ORDER BY updateddate DESC";
 		return $this->db->query($q)->result_array();
 	}
-	public function select_bas_progress($filemonth, $fileyear, $client)
+	public function select_bas_progress($filemonth, $fileyear)
 	{
 		$filter = "AND b.subcategory =".$_SESSION["clientid"];
-		if($client == 'ALL'){
-			$client = '%%';
-		}
 		if($_SESSION["position"] != "client"){
 			$filter = "AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")";
 		}
@@ -165,10 +162,10 @@ class Data extends CI_Model {
 			b.value,
 			((COUNT(a.entity) * 17) + 10) AS progress,
             CASE
-            	WHEN COUNT(a.entity) = 1 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', data_upload, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 2 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 3 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_review, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 4 THEN CASE WHEN STR_TO_DATE(CONCAT(a.month, ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 1 THEN CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', data_upload, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 2 THEN CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 3 THEN CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_review, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
+            	WHEN COUNT(a.entity) = 4 THEN CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= CURDATE() THEN 'primary' ELSE 'danger' END
 			END AS 'barcolor'
 		FROM dropdown b
 		LEFT JOIN clients d ON b.subcategory = d.clientid
@@ -181,11 +178,12 @@ class Data extends CI_Model {
 		".$filter."
 		GROUP BY b.value
         ORDER BY d.clientname";
-		$params = array($filemonth, $fileyear, $client);
+		$params = array($filemonth, $fileyear, $_SESSION["clientid"]);
 		return $this->db->query($q,$params)->result_array();
 	}
-	public function select_due($filemonth, $fileyear, $client)
+	public function select_due($filemonth, $fileyear)
 	{
+		$client = $_SESSION["clientid"];
 		$q = "SELECT * FROM filedue a WHERE
 			month = (SELECT x.month FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)
 			AND year = (SELECT x.year FROM filedue x WHERE x.clientid = ? ORDER BY x.id DESC LIMIT 1)

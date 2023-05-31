@@ -53,12 +53,13 @@
                         <!-- Card header -->
                         <div class="card-header">
                             <div class="row">
-                                <?php if($_SESSION["position"] != "client"){ ?>
+                                <!-- <?php if($_SESSION["position"] != "client"){ ?>
                                     <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
                                     <div class="col-md-2">
                                             <select class="form-control" id="selectClient" onchange="loadHome()"></select>
                                     </div>
-                                <?php }else{ ?><div class="col-md-3"></div><?php } ?>
+                                <?php }else{ ?><div class="col-md-3"></div><?php } ?> -->
+                                <div class="col-md-3"></div>
                                 <label for="example-text-input" class="col-md-5 col-form-label form-control-label text-right">GST Filing Period:</label>
                                 <div class="col-md-2">
                                     <select class="form-control" id="selectMonth" onchange="loadHome()"></select>
@@ -87,7 +88,6 @@
         params = {
             filemonth   : $("#selectMonth").val(),
             fileyear    : $("#selectYear").val(),
-            client      : $("#selectClient").val(),
         };
         $.post("select_bas_progress", params).done(function(data) {
             $("#div_home_table").html(data);

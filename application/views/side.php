@@ -70,7 +70,7 @@
                             <span class="nav-link-text">FAQ</span>
                         </a>
                     </li>
-                    <?php if(($_SESSION["position"] != "client") && ($_SESSION["activepage"] != "HOME")){ ?>
+                    <?php //if(($_SESSION["position"] != "client") && ($_SESSION["activepage"] != "HOME")){ ?>
                     <li class="nav-item">
                         <label for="example-text-input" class="col-md-1 col-form-label form-control-label">Client:</label>
                         <div class="col-md-12">
@@ -99,7 +99,7 @@
                             </script>
                         </div>
                     </li>
-                    <?php } ?>
+                    <?php //} ?>
                 </ul>
             </div>
         </div>
