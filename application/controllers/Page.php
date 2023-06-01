@@ -681,10 +681,10 @@ class Page extends CI_Controller
 	{
 		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
 			$post = $this->security->xss_clean($this->input->post());
-			$data = $this->data->view_filehistory($post["fileid"]);
-			if (empty($data)) {
-				$this->data->insert_history("Viewed", $post["fileid"], "");
-			}
+			//$data = $this->data->view_filehistory($post["fileid"]);
+			//if (empty($data)) {
+			$this->data->insert_history("Viewed", $post["fileid"], "");
+			//}
 		}
 	}
 	function approve_file()

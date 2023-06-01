@@ -32,7 +32,7 @@
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" onclick="deleteFile(<?php echo $row['fileid']; ?>)">
                                 Delete
                             </button>
-                        <?php }if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") && ($row['filestatus'] == "Viewed" ||  $row['filestatus'] == "Updated")){ ?>
+                        <?php }if(($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") && ($row['filestatus'] == "Viewed")){ ?>
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalApprove" onclick="getFileID(<?php echo $row['fileid']; ?>)">
                                 Approve
                             </button>
