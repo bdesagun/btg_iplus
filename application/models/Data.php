@@ -153,10 +153,6 @@ class Data extends CI_Model {
 	}
 	public function select_bas_progress($filemonth, $fileyear)
 	{
-		$filter = "AND b.subcategory =".$_SESSION["clientid"];
-		if($_SESSION["position"] != "client"){
-			$filter = "AND b.subcategory IN (".$_SESSION["clientaccess"].") AND b.value IN (".$_SESSION["entityaccess"].")";
-		}
 		$q = "SELECT
 			d.clientname,
 			b.value,
@@ -179,7 +175,6 @@ class Data extends CI_Model {
         	AND a.month = ? AND a.year = ?
         LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
 		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
-		".$filter."
 		GROUP BY b.value
         ORDER BY d.clientname";
 		$params = array($filemonth, $fileyear, $_SESSION["clientid"]);
@@ -199,14 +194,14 @@ class Data extends CI_Model {
 	{
 		//SELECT MONTH(STR_TO_DATE('April 3, 2023', '%M %d, %Y'));
 		//SELECT STR_TO_DATE('April 3, 2023', '%M %d, %Y');
-		$q = "DELETE FROM filedue WHERE clientid IN (".$_SESSION["clientaccess"].") AND month = ? AND year = ?";
+		$q = "DELETE FROM filedue WHERE clientid = ".$_SESSION["clientid"]." AND month = ? AND year = ?";
 		$params = array($filemonth, $fileyear);
 		$this->db->query($q, $params);
-		//$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
-		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement)
-				SELECT clientid, ? AS month, ? AS year, ? AS data_request, ? AS data_upload, ? AS bas_preparation, ? AS bas_review, ? AS bas_sign_off, ? AS bas_lodgement
-				FROM clients WHERE clientid IN (".$_SESSION["clientaccess"].")";
-		$params = array($filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
+		$q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement) VALUES(?,?,?,?,?,?,?,?,?)";
+		// $q = "INSERT INTO filedue(clientid, month, year, data_request, data_upload, bas_preparation, bas_review, bas_sign_off, bas_lodgement)
+		// 		SELECT clientid, ? AS month, ? AS year, ? AS data_request, ? AS data_upload, ? AS bas_preparation, ? AS bas_review, ? AS bas_sign_off, ? AS bas_lodgement
+		// 		FROM clients WHERE clientid IN (".$_SESSION["clientaccess"].")";
+		$params = array($_SESSION["clientid"],$filemonth, $fileyear, $data_request, $data_upload, $bas_preparation, $bas_review, $bas_sign_off, $bas_lodgement);
 		$this->db->query($q, $params);
 
 		$this->data->insert_trail("Update schedule in home page. Month: ".$filemonth.", Year: ".$fileyear);

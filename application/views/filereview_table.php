@@ -22,7 +22,7 @@
                     <td><?php echo $row['filedate']; ?></td>
                     <td>
                         <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
-                            <?php if($row['trailstatus'] != 'Reviewed' && $row['trailstatus'] != 'Finalized'){ ?>
+                            <?php if($row['trailstatus'] == 'Confirmed'){ ?>
                                 <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalFilereview" onclick="editFileReview(<?php echo $row['fileid']; ?>)">
                                     Edit
                                 </button>

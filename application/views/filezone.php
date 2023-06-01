@@ -663,6 +663,8 @@
 </body>
 <script>
     var file_id;
+    var formEl = document.forms.form_upload;
+    var formEr = document.forms.form_upload_review;
     GetMonth();
     GetYear();
     GetMonth2();
@@ -1015,26 +1017,24 @@
             };
             if(saveStatus == 'Upload File'){
                 $.post("insert_file",params).done(function(data) {
-                    swal("Saved!", "File successfully submitted!", "success");
-                    $('#modalFilezone').modal('toggle');
                     if ($("#file_to_upload").val() != ""){
-                        saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
+                        //saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
+                        formEl.addEventListener('submit', saveToFolder);
+                        var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        formEl.dispatchEvent(submitEvent);
                     }
-                    loadFiles();
                 });
             }else{
                 $.post("update_file",params).done(function(data) {
-                    swal("Saved!", "File successfully updated!", "success");
-                    $('#modalFilezone').modal('toggle');
                     if ($("#file_to_upload").val() != ""){
-                        saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
+                        //saveToFolder($("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val());
+                        formEl.addEventListener('submit', saveToFolder);
+                        var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        formEl.dispatchEvent(submitEvent);
                     }
-                    loadFiles();
                 });
             }
         }
-        $("#savefilezone").prop('disabled', false);
-        document.getElementById('savefilezone').innerHTML = 'Save';
     }
     function saveFileReview(){
         $("#savefilereview").prop('disabled', true);
@@ -1051,26 +1051,24 @@
             };
             if(saveStatus == 'Upload BTG File'){
                 $.post("insert_filereview",params).done(function(data) {
-                    swal("Saved!", "BTG File successfully submitted!", "success");
-                    $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
-                        saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
+                        //saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
+                        formEr.addEventListener('submit', saveToFolderReview);
+                        var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        formEr.dispatchEvent(submitEvent);
                     }
-                    loadFiles();
                 });
             }else{
                 $.post("update_filereview",params).done(function(data) {
-                    swal("Saved!", "BTG File successfully updated!", "success");
-                    $('#modalFilereview').modal('toggle');
                     if ($("#file_to_upload_review").val() != ""){
-                        saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
+                        //saveToFolderReview($("#selectEntityReview").val(),$("#selectMonthReview").val(),$("#selectYearReview").val());
+                        formEr.addEventListener('submit', saveToFolderReview);
+                        var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        formEr.dispatchEvent(submitEvent);
                     }
-                    loadFiles();
                 });
             }
         }
-        $("#savefilereview").prop('disabled', false);
-        document.getElementById('savefilereview').innerHTML = 'Save';
     }
     function auditFile(status){
         var filentitybas;
@@ -1117,38 +1115,49 @@
             loadFiles();
         });
     }
-    function saveToFolder(entity, month, year){
+    //$("#selectEntity").val(),$("#selectMonth2").val(),$("#selectYear2").val())
+    function saveToFolder(event){
         event.preventDefault();
-        var formEl = document.forms.form_upload;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + entity + '&month=' + month + '&year=' + year,
+            url:'<?php echo base_url(); ?>index.php/page/upload_file?entity=' + $("#selectEntity").val() + '&month=' + $("#selectMonth2").val() + '&year=' + $("#selectYear2").val(),
             type:"post",
             data:new FormData(formEl),
             processData:false,
             contentType:false,
             cache:false,
-            async:false,
+            async:true,
             beforeSend: function() {},
             success: function(response) {},
             error: function() {},
-            complete: function() {}
+            complete: function() {
+                $('#modalFilezone').modal('toggle');
+                swal("Saved!", "Client File successfully saved!", "success");
+                $("#savefilezone").prop('disabled', false);
+                document.getElementById('savefilezone').innerHTML = 'Save';
+                loadFiles();
+            }
         });
     }
-    function saveToFolderReview(entity, month, year){
+    function saveToFolderReview(event){
         event.preventDefault();
-        var formEl = document.forms.form_upload_review;
         $.ajax({
-            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + entity + '&month=' + month + '&year=' + year,
+            url:'<?php echo base_url(); ?>index.php/page/upload_file_review?entity=' + $("#selectEntityReview").val() + '&month=' + $("#selectMonthReview").val() + '&year=' + $("#selectYearReview").val(),
             type:"post",
-            data:new FormData(formEl),
+            data:new FormData(formEr),
             processData:false,
             contentType:false,
             cache:false,
-            async:false,
+            async:true,
             beforeSend: function() {},
             success: function(response) {},
             error: function() {},
-            complete: function() {}
+            complete: function() {
+                $('#modalFilereview').modal('toggle');
+                swal("Saved!", "BTG File successfully saved!", "success");
+                $("#savefilereview").prop('disabled', false);
+                document.getElementById('savefilereview').innerHTML = 'Save';
+                loadFiles();
+            }
         });
     }
     $('input[type="file"]').change(function(e){
