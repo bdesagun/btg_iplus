@@ -529,24 +529,32 @@ class Page extends CI_Controller
 		$this->data->insert_client(
 			$post["clientname"],
 			$post["address"],
-			$post["industry"]
+			$post["industry"],
+			$post["clientcode"],
+			$post["abndetails"],
+			$post["gstdetails"],
+			$post["website"],
+			$post["typebas"],
+			$post["filetype"],
+			$post["frequency"],
+			$post["otherreg"],
+			$post["fileother"]
 		);
 	}
 	function insert_entity()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$this->data->insert_entity(
-			$post["clientid"],
-			$post["entity"]
-		);
+		$this->data->insert_entity($post["clientid"],$post["entity"]);
+	}
+	function update_entity()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_entity($post["entityid"],$post["entityname"]);
 	}
 	function delete_entity()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$this->data->delete_entity(
-			$post["value"],
-			$post["subcategory"]
-		);
+		$this->data->delete_entity($post["entityid"]);
 	}
 	function update_client()
 	{
@@ -555,6 +563,15 @@ class Page extends CI_Controller
 			$post["clientname"],
 			$post["address"],
 			$post["industry"],
+			$post["clientcode"],
+			$post["abndetails"],
+			$post["gstdetails"],
+			$post["website"],
+			$post["typebas"],
+			$post["filetype"],
+			$post["frequency"],
+			$post["otherreg"],
+			$post["fileother"],
 			$post["clientid"]
 		);
 	}

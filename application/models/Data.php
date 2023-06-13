@@ -460,8 +460,8 @@ class Data extends CI_Model {
 	}
 	public function select_entity_all($id)
 	{
-		$q = "SELECT d.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=d.value AND f.clientid=d.subcategory) AS filecount
-		FROM dropdown d WHERE category='client' AND subcategory=?";
+		$q = "SELECT e.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=e.entityname AND f.clientid=e.clientid) AS filecount
+		FROM entities e WHERE e.clientid=?";
 		$param = array($id);
 		return $this->db->query($q,$param)->result_array();
 	}
@@ -496,16 +496,35 @@ class Data extends CI_Model {
 		$params = array($accountname, $email, $position, $clientname, $username);
 		$this->db->query($q, $params);
 	}
-	public function insert_client($clientname, $address, $industry)
+	public function insert_client($clientname, $address, $industry, $clientcode, $abndetails, $gstdetails, $website, $typebas, $filetype, $frequency, $otherreg, $fileother)
 	{
-		$q = "INSERT INTO clients(clientname, address, industry, active) VALUES(?,?,?,'1')";
-		$params = array($clientname, $address, $industry);
+		$q = "INSERT INTO clients(clientname, address, industry, clientcode, abndetails, gstdetails, website, typebas, filetype, frequency, otherreg, fileother, active) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,'1')";
+		$params = array($clientname, $address, $industry, $clientcode, $abndetails, $gstdetails, $website, $typebas, $filetype, $frequency, $otherreg, $fileother);
+		$this->db->query($q, $params);
+
+	}
+	public function update_client($clientname, $address, $industry, $clientcode, $abndetails, $gstdetails, $website, $typebas, $filetype, $frequency, $otherreg, $fileother, $clientid)
+	{
+		$q = "UPDATE clients SET clientname=?, address=?, industry=?, clientcode=?, abndetails=?, gstdetails=?, website=?, typebas=?, filetype=?, frequency=?, otherreg=?, fileother=? WHERE clientid=?";
+		$params = array($clientname, $address, $industry, $clientcode, $abndetails, $gstdetails, $website, $typebas, $filetype, $frequency, $otherreg, $fileother, $clientid);
 		$this->db->query($q, $params);
 	}
 	public function insert_entity($clientid, $entity)
 	{
-		$q = "INSERT INTO dropdown(category, subcategory, value, name, active) VALUES('client',?,?,?,'1')";
-		$params = array($clientid, $entity, $entity);
+		$q = "INSERT INTO entities(clientid, entitycode, entityname, active)
+		SELECT c.clientid, CONCAT(SUBSTRING(clientcode, 1, LENGTH(clientcode) - 2),
+		CASE WHEN (SELECT COUNT(*) FROM entities e WHERE e.clientid = c.clientid) = 0 THEN
+		'01' ELSE (SELECT LPAD(CAST(RIGHT(MAX(entitycode),2) AS INT) + 1, 2, '0') FROM entities e WHERE e.clientid = c.clientid) END)
+		AS entitycode, ? AS entityname, '1' AS active
+		FROM clients c
+		WHERE clientid = ?";
+		$params = array($entity, $clientid);
+		$this->db->query($q, $params);
+	}
+	public function update_entity($entityid, $entityname)
+	{
+		$q = "UPDATE entities SET entityname=? WHERE entityid=?";
+		$params = array($entityname, $entityid);
 		$this->db->query($q, $params);
 	}
 	public function insert_access($clientid, $entity, $username)
@@ -531,16 +550,10 @@ class Data extends CI_Model {
 		$params = array($clientid, $entity, $username);
 		$this->db->query($q, $params);
 	}
-	public function delete_entity($value, $subcategory)
+	public function delete_entity($entityid)
 	{
-		$q = "DELETE FROM dropdown WHERE value=? AND subcategory=?";
-		$params = array($value, $subcategory);
-		$this->db->query($q, $params);
-	}
-	public function update_client($clientname, $address, $industry, $clientid)
-	{
-		$q = "UPDATE clients SET clientname=?, address=?, industry=? WHERE clientid=?";
-		$params = array($clientname, $address, $industry, $clientid);
+		$q = "DELETE FROM entities WHERE entityid=?";
+		$params = array($entityid);
 		$this->db->query($q, $params);
 	}
 	public function update_profile($address, $mobilenumber, $telephonenumber)

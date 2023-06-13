@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="modal fade" id="modalClient" tabindex="-1" role="dialog" aria-labelledby="clientLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="clientLabel">Create Account</h5>
@@ -38,6 +38,13 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Client ID:</label>
+                                    <input class="form-control" id="clientcode" type="text" autocomplete="off">
+                                    <div id='val_address'></div>
+                                </div>
+                            </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label class="form-control-label">Client Name:</label>
@@ -54,13 +61,136 @@
                                     <div id='val_address'></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label class="form-control-label">Industry:</label>
                                     <input class="form-control" id="industry" type="text" autocomplete="off">
                                     <div id='val_industry'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">ABN Details:</label>
+                                    <input class="form-control" id="abndetails" type="text" autocomplete="off">
+                                    <div id='val_abndetails'></div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">GST Registration Details:</label>
+                                    <input class="form-control" id="gstdetails" type="text" autocomplete="off">
+                                    <div id='val_gstdetails'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Reporting Type:</label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="typebas" class="custom-control-input" id="option1" type="radio" checked>
+                                                <label class="custom-control-label" for="option1">Group BAS</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="typebas" class="custom-control-input" id="option2" type="radio">
+                                                <label class="custom-control-label" for="option2">Standalone BAS</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="typebas" class="custom-control-input" id="option3" type="radio">
+                                                <label class="custom-control-label" for="option3">Mixed</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id='val_typebas'></div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Other Registration:</label>
+                                    <input class="form-control" id="otherreg" type="text" autocomplete="off">
+                                    <div id='val_otherreg'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">File Type:</label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="custom-control custom-checkbox mb-3">
+                                                <input class="custom-control-input" name="filetype" id="check1" type="checkbox">
+                                                <label class="custom-control-label" for="check1">Activity Statement</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-checkbox mb-3">
+                                                <input class="custom-control-input" name="filetype" id="check2" type="checkbox">
+                                                <label class="custom-control-label" for="check2">General Ledger</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-checkbox mb-3">
+                                                <input class="custom-control-input" name="filetype" id="check3" type="checkbox">
+                                                <label class="custom-control-label" for="check3">Transaction Listings</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-checkbox mb-3">
+                                                <input class="custom-control-input" name="filetype" id="check4" type="checkbox">
+                                                <label class="custom-control-label" for="check4">Trial Balance</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <div class="custom-control custom-checkbox mb-3">
+                                                <input class="custom-control-input" name="filetype" id="check5" type="checkbox" onchange="var input = document.getElementById('fileother'); input.disabled = (input.disabled === false ? true : false);">
+                                                <label class="custom-control-label" for="check5">Others</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-9">
+                                            <input class="form-control" id="fileother" type="text" placeholder="Other File type" autocomplete="off" disabled>
+                                        </div>
+                                    </div>
+                                    <div id='val_filetype'></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Reporting Frequency:</label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="frequency" class="custom-control-input" id="monthly" type="radio" checked>
+                                                <label class="custom-control-label" for="monthly">Monthly</label>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="custom-control custom-radio mb-3">
+                                                <input name="frequency" class="custom-control-input" id="quarterly" type="radio">
+                                                <label class="custom-control-label" for="quarterly">Quarterly</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id='val_frequency'></div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="form-control-label">Website:</label>
+                                    <input class="form-control" id="website" type="text" autocomplete="off">
+                                    <div id='val_website'></div>
                                 </div>
                             </div>
                         </div>
@@ -73,7 +203,7 @@
             </div>
         </div>
         <div class="modal fade" id="modalEntity" tabindex="-1" role="dialog" aria-labelledby="entityLabel" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="entityLabel">Entity List</h5>
@@ -191,14 +321,24 @@
             });
         }
     }
-    function deleteEntity(value, subcategory){
+    function deleteEntity(id){
         var params;
         params = {
-            value          : value,
-            subcategory    : subcategory
+            entityid    : id,
         };
         $.post("delete_entity",params).done(function(data) {
             viewEntity(client_id);
+        });
+    }
+    function updateEntity(id){
+        var params;
+        params = {
+            entityid    : id,
+            entityname  : $("#entity" + id).val(),
+        };
+        $.post("update_entity",params).done(function(data) {
+            viewEntity(client_id);
+            //setOnView(id);
         });
     }
     function testClient(){
@@ -229,12 +369,48 @@
     function saveClient(){
         if (testClient() == 0){
             var saveStatus = document.getElementById('clientLabel').innerHTML;
+            var selectedtypebas;
+            var selectedfiletype = "";
+            var selectedfrequency;
             var params;
+            var options = document.getElementsByName('typebas');
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].checked) {
+                    selectedtypebas = document.querySelector('label[for="' + options[i].id + '"]').innerText;
+                    break;
+                }
+            }
+            options = document.getElementsByName('filetype');
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].checked) {
+                    if(selectedfiletype == ""){
+                        selectedfiletype = selectedfiletype + (i + 1);
+                    }else{
+                        selectedfiletype = selectedfiletype + "," + (i + 1);
+                    }
+                }
+            }
+            options = document.getElementsByName('frequency');
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].checked) {
+                    selectedfrequency = document.querySelector('label[for="' + options[i].id + '"]').innerText;
+                    break;
+                }
+            }
             params = {
                 clientid    : client_id,
                 clientname  : $("#clientname").val(),
                 address     : $("#address").val(),
                 industry    : $("#industry").val(),
+                clientcode  : $("#clientcode").val(),
+                abndetails  : $("#abndetails").val(),
+                gstdetails  : $("#gstdetails").val(),
+                website     : $("#website").val(),
+                typebas     : selectedtypebas,
+                filetype    : selectedfiletype,
+                frequency   : selectedfrequency,
+                otherreg    : $("#otherreg").val(),
+                fileother   : $("#fileother").val(),
             };
             if(saveStatus == 'New Client'){
                 $.post("insert_client",params).done(function(data) {
@@ -296,12 +472,69 @@
             $("#clientname").val(client.clientname);
             $("#address").val(client.address);
             $("#industry").val(client.industry);
+            $("#clientcode").val(client.clientcode);
+            $("#abndetails").val(client.abndetails);
+            $("#gstdetails").val(client.gstdetails);
+            $("#website").val(client.website);
+            $("#otherreg").val(client.otherreg);
+            $("#fileother").val(client.fileother);
+            var options = document.getElementsByName('typebas');
+            for (var i = 0; i < options.length; i++) {
+                if (client.typebas == document.querySelector('label[for="' + options[i].id + '"]').innerText){
+                    document.getElementById(options[i].id).checked = true;
+                    break;
+                }
+            }
+            options = document.getElementsByName('filetype');
+            for (var i = 0; i < options.length; i++) {
+                if(client.filetype.includes(i + 1)){
+                    document.getElementById(options[i].id).checked = true;
+                    if(i == 4){
+                        var input = document.getElementById('fileother');
+                        input.disabled = false;
+                    }
+                }else{
+                    document.getElementById(options[i].id).checked = false;
+                }
+            }
+
+            options = document.getElementsByName('frequency');
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].checked) {
+                    selectedfrequency = document.querySelector('label[for="' + options[i].id + '"]').innerText;
+                    break;
+                }
+            }
         });
+    }
+    function setOnedit(id, name){
+        $(".onview" + id).hide();
+        $(".onedit" + id).show();
+        $("#entity" + id).val(name);
+    }
+    function setOnview(id){
+        $(".onview" + id).show();
+        $(".onedit" + id).hide();
     }
     function clearClient(){
         $("#clientname").val("");
         $("#address").val("");
         $("#industry").val("");
+        $("#clientcode").val("");
+        $("#abndetails").val("");
+        $("#gstdetails").val("");
+        $("#website").val("");
+        $("#otherreg").val("");
+        $("#fileother").val("");
+        document.getElementById('option1').checked = true;
+        document.getElementById('monthly').checked = true;
+        document.getElementById('check1').checked = false;
+        document.getElementById('check2').checked = false;
+        document.getElementById('check3').checked = false;
+        document.getElementById('check4').checked = false;
+        document.getElementById('check5').checked = false;
+        var input = document.getElementById('fileother');
+        input.disabled = true;
         $("#val_clientname").empty();
         $("#val_address").empty();
         $("#val_industry").empty();
