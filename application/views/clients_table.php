@@ -1,9 +1,10 @@
 <table class="table table-flush" id="table_account_list">
     <thead class="thead-light">
         <tr>
-            <th>CLient Name</th>
-            <th>Address</th>
-            <th>Industry</th>
+            <th>Client ID</th>
+            <th>Client Name</th>
+            <th>ABN Details</th>
+            <th>Reporting Type</th>
             <th>Status</th>
             <th style="width:20%">Action</th>
         </tr>
@@ -11,9 +12,10 @@
     <tbody>
         <?php foreach ($clients as $row) { ?>
                 <tr>
+                    <td><?php echo $row['clientcode']; ?></td>
                     <td><?php echo $row['clientname']; ?></td>
-                    <td><?php echo $row['address']; ?></td>
-                    <td><?php echo $row['industry']; ?></td>
+                    <td><?php echo $row['abndetails']; ?></td>
+                    <td><?php echo $row['typebas']; ?></td>
                     <td><?php echo $row['status']; ?></td>
                     <td>
                         <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalClient" onclick="editClient('<?php echo $row['clientid']; ?>')">Edit</button>
