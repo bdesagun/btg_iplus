@@ -460,8 +460,17 @@ class Data extends CI_Model {
 	}
 	public function select_entity_all($id)
 	{
-		$q = "SELECT e.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=e.entityname AND f.clientid=e.clientid) AS filecount
-		FROM entities e WHERE e.clientid=?";
+		$q = "SELECT e.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=e.entityname AND f.clientid=e.clientid) AS filecount, g.groupname
+		FROM entities e
+        LEFT JOIN entitygroups g ON g.groupid=e.groupid
+		WHERE e.clientid=? AND e.active=1";
+		$param = array($id);
+		return $this->db->query($q,$param)->result_array();
+	}
+	public function select_group_all($id)
+	{
+		$q = "SELECT e.*, (SELECT COUNT(*) FROM entities f WHERE f.groupid=e.groupid AND f.active = 1) AS entitycount
+		FROM entitygroups e WHERE clientid=? AND active=1";
 		$param = array($id);
 		return $this->db->query($q,$param)->result_array();
 	}
@@ -509,22 +518,48 @@ class Data extends CI_Model {
 		$params = array($clientname, $address, $industry, $clientcode, $abndetails, $gstdetails, $website, $typebas, $filetype, $frequency, $otherreg, $fileother, $clientid);
 		$this->db->query($q, $params);
 	}
-	public function insert_entity($clientid, $entity)
+	public function insert_entity($clientid, $entity, $group)
 	{
-		$q = "INSERT INTO entities(clientid, entitycode, entityname, active)
-		SELECT c.clientid, CONCAT(SUBSTRING(clientcode, 1, LENGTH(clientcode) - 2),
+		$q = "INSERT INTO entities(clientid, groupid, entitycode, entityname, active)
+		SELECT c.clientid, ? AS groupid, CONCAT(SUBSTRING(clientcode, 1, LENGTH(clientcode) - 2),
 		CASE WHEN (SELECT COUNT(*) FROM entities e WHERE e.clientid = c.clientid) = 0 THEN
 		'01' ELSE (SELECT LPAD(CAST(RIGHT(MAX(entitycode),2) AS INT) + 1, 2, '0') FROM entities e WHERE e.clientid = c.clientid) END)
 		AS entitycode, ? AS entityname, '1' AS active
 		FROM clients c
 		WHERE clientid = ?";
-		$params = array($entity, $clientid);
+		$params = array($group, $entity, $clientid);
 		$this->db->query($q, $params);
 	}
-	public function update_entity($entityid, $entityname)
+	public function update_entity($entityid, $entityname, $groupid)
 	{
-		$q = "UPDATE entities SET entityname=? WHERE entityid=?";
-		$params = array($entityname, $entityid);
+		$q = "UPDATE entities SET entityname=?, groupid=? WHERE entityid=?";
+		$params = array($entityname, $groupid, $entityid);
+		$this->db->query($q, $params);
+	}
+	public function delete_entity($entityid)
+	{
+		$q = "UPDATE entities SET active=0 WHERE entityid=?";
+		$params = array($entityid);
+		$this->db->query($q, $params);
+	}
+
+	public function insert_group($clientid, $group)
+	{
+		$q = "INSERT INTO entitygroups(clientid, groupname, active)
+			VALUES(?,?,'1')";
+		$params = array($clientid, $group);
+		$this->db->query($q, $params);
+	}
+	public function update_group($groupid, $groupname)
+	{
+		$q = "UPDATE entitygroups SET groupname=? WHERE groupid=?";
+		$params = array($groupname, $groupid);
+		$this->db->query($q, $params);
+	}
+	public function delete_group($groupid)
+	{
+		$q = "UPDATE entitygroups SET active=0 WHERE groupid=?";
+		$params = array($groupid);
 		$this->db->query($q, $params);
 	}
 	public function insert_access($clientid, $entity, $username)
@@ -548,12 +583,6 @@ class Data extends CI_Model {
 	{
 		$q = "DELETE FROM userentity WHERE clientid=? AND entity=? AND username=?";
 		$params = array($clientid, $entity, $username);
-		$this->db->query($q, $params);
-	}
-	public function delete_entity($entityid)
-	{
-		$q = "DELETE FROM entities WHERE entityid=?";
-		$params = array($entityid);
 		$this->db->query($q, $params);
 	}
 	public function update_profile($address, $mobilenumber, $telephonenumber)

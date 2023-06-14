@@ -450,7 +450,27 @@ class Page extends CI_Controller
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$data["entity"] = $this->data->select_entity_all($post["clientid"]);
+		$data["typebas"] = $post["typebas"];
 		$this->load->view("maintenance/entity_table", $data);
+	}
+	function select_group_list()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data["group"] = $this->data->select_group_all($post["clientid"]);
+		$this->load->view("maintenance/group_table", $data);
+	}
+	function select_group()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$option = "";
+		$res = $this->data->select_group_all($post["clientid"]);
+		if($post["typebas"] == 'Mixed'){
+			$option .= "<option value='0'>No Group</option>";
+		}
+		foreach ($res as $v) {
+			$option .= "<option value='" . $v["groupid"] . "'>" . $v["groupname"] . "</option>";
+		}
+		echo $option;
 	}
 	function select_access_list()
 	{
@@ -544,17 +564,32 @@ class Page extends CI_Controller
 	function insert_entity()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$this->data->insert_entity($post["clientid"],$post["entity"]);
+		$this->data->insert_entity($post["clientid"],$post["entity"],$post["group"]);
 	}
 	function update_entity()
 	{
 		$post = $this->security->xss_clean($this->input->post());
-		$this->data->update_entity($post["entityid"],$post["entityname"]);
+		$this->data->update_entity($post["entityid"],$post["entityname"],$post["groupid"]);
 	}
 	function delete_entity()
 	{
 		$post = $this->security->xss_clean($this->input->post());
 		$this->data->delete_entity($post["entityid"]);
+	}
+	function insert_group()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->insert_group($post["clientid"],$post["group"]);
+	}
+	function update_group()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->update_group($post["groupid"],$post["groupname"]);
+	}
+	function delete_group()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$this->data->delete_group($post["groupid"]);
 	}
 	function update_client()
 	{
