@@ -73,7 +73,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label class="form-control-label">ABN Details:</label>
-                                    <input class="form-control" id="abndetails" type="text" autocomplete="off">
+                                    <input class="form-control" id="abndetails" type="text" oninput="limitInput()" autocomplete="off" maxlength="14">
                                     <div id='val_abndetails'></div>
                                 </div>
                             </div>
@@ -213,10 +213,13 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-9">
-                                    <input class="form-control" id="entity" type="text" placeholder="Input Entity Name" autocomplete="off">
+                            <div class="col-5">
+                                <input class="form-control" id="entity" type="text" placeholder="Input Entity Name" autocomplete="off">
                             </div>
-                            <div class="col-3 text-right">
+                            <div class="col-5">
+                                <select class="form-control" id="selectGroup"></select>
+                            </div>
+                            <div class="col-2 text-right">
                                 <button type="button" class="btn btn-outline-default" onclick="addEntity()">Add</button>
                             </div>
                         </div>
@@ -224,6 +227,38 @@
                             <div class="col">
                                 <div class="form-group">
                                     <div class="table-responsive py-4"  id="div_entity_table"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalGroup" tabindex="-1" role="dialog" aria-labelledby="groupLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="groupLabel">Group List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-9">
+                                <input class="form-control" id="group" type="text" placeholder="Input Group Name" autocomplete="off">
+                            </div>
+                            <div class="col-3 text-right">
+                                <button type="button" class="btn btn-outline-default" onclick="addGroup()">Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <div class="table-responsive py-4"  id="div_group_table"></div>
                                 </div>
                             </div>
                         </div>
@@ -289,6 +324,7 @@
 <script>
     var activeState;
     var client_id;
+    var type_bas;
     loadClient();
     function loadClient(){
         $("#div_client_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
@@ -296,16 +332,46 @@
             $("#div_client_table").html(data);
         });
     }
-    function viewEntity(id){
+    function GetGroup(id,typebas){
+        $("#selectGroup").prop('disabled', true);
+        $('#selectGroup')
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        $.post("select_group", { clientid : id, typebas : typebas }, function(data) {
+            $("#selectGroup").html(data);
+            $("#selectGroup").prop('disabled', false);
+        });
+    }
+    function viewEntity(id,typebas){
+        GetGroup(id,typebas);
+        if(typebas == 'Standalone BAS'){
+            $("#selectGroup").hide();
+        }else{
+            $("#selectGroup").show();
+        }
         $("#entity").val("");
         $("#div_entity_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        client_id = id;
+        type_bas = typebas;
+        var params;
+        params = {
+            clientid : id,
+            typebas  : typebas,
+        };
+        $.post("select_entity_list", params).done(function(data) {
+            $("#div_entity_table").html(data);
+        });
+    }
+    function viewGroup(id){
+        $("#group").val("");
+        $("#div_group_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
         client_id = id;
         var params;
         params = {
             clientid : id,
         };
-        $.post("select_entity_list", params).done(function(data) {
-            $("#div_entity_table").html(data);
+        $.post("select_group_list", params).done(function(data) {
+            $("#div_group_table").html(data);
         });
     }
     function addEntity(){
@@ -314,9 +380,12 @@
             params = {
                 clientid    : client_id,
                 entity      : $("#entity").val(),
+                group       : $("#selectGroup").val(),
             };
+            console.log(params);
             $.post("insert_entity",params).done(function(data) {
-                viewEntity(client_id);
+                viewEntity(client_id, type_bas);
+                GetGroup(id,type_bas)
                 $("#entity").val("");
             });
         }
@@ -335,9 +404,43 @@
         params = {
             entityid    : id,
             entityname  : $("#entity" + id).val(),
+            groupid     : $("#selectGroup" + id).val(),
         };
         $.post("update_entity",params).done(function(data) {
-            viewEntity(client_id);
+            viewEntity(client_id, type_bas);
+            //setOnView(id);
+        });
+    }
+    function addGroup(){
+        if ($("#group").val() != ''){
+            var params;
+            params = {
+                clientid    : client_id,
+                group       : $("#group").val(),
+            };
+            $.post("insert_group",params).done(function(data) {
+                viewGroup(client_id);
+                $("#group").val("");
+            });
+        }
+    }
+    function deleteGroup(id){
+        var params;
+        params = {
+            groupid    : id,
+        };
+        $.post("delete_group",params).done(function(data) {
+            viewGroup(client_id);
+        });
+    }
+    function updateGroup(id){
+        var params;
+        params = {
+            groupid    : id,
+            groupname  : $("#group" + id).val(),
+        };
+        $.post("update_group",params).done(function(data) {
+            viewGroup(client_id);
             //setOnView(id);
         });
     }
@@ -507,14 +610,38 @@
             }
         });
     }
-    function setOnedit(id, name){
+    function GetGroupList(id, group){
+        $("#selectGroup" + id).prop('disabled', true);
+        $('#selectGroup' + id)
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        $.post("select_group", { clientid : client_id }, function(data) {
+            //console.log(data);
+            $("#selectGroup" + id).html(data);
+            $("#selectGroup" + id).prop('disabled', false);
+            if(group != ''){
+                $("#selectGroup" + id + " option:contains(" + group + ")").prop("selected", true);
+            }
+        });
+    }
+    function setOnedit(id, name, group){
         $(".onview" + id).hide();
         $(".onedit" + id).show();
         $("#entity" + id).val(name);
+        GetGroupList(id, group)
     }
     function setOnview(id){
         $(".onview" + id).show();
         $(".onedit" + id).hide();
+    }
+    function setOneditGroup(id, name){
+        $(".onviewGroup" + id).hide();
+        $(".oneditGroup" + id).show();
+        $("#group" + id).val(name);
+    }
+    function setOnviewGroup(id){
+        $(".onviewGroup" + id).show();
+        $(".oneditGroup" + id).hide();
     }
     function clearClient(){
         $("#clientname").val("");
@@ -539,5 +666,21 @@
         $("#val_address").empty();
         $("#val_industry").empty();
     }
+    function limitInput() {
+      var input = document.getElementById("abndetails");
+      var maxLength = input.getAttribute("maxlength");
+      var currentLength = input.value.length;
+
+      if (currentLength >= maxLength) {
+        input.value = input.value.slice(0, maxLength);
+      }
+    }
+    $("#abndetails").on("input", function() {
+        var value = $(this).val();
+        value = value.replace(/\D/g, ""); // Remove non-numeric characters
+        value = value.slice(0, 2) + "-" + value.slice(2, 5) + "-" + value.slice(5, 8) + "-" + value.slice(8, 11); // Add hyphens
+        value = value.slice(0, 14); // Limit length to 9 characters
+        $(this).val(value);
+    });
 </script>
 </html>

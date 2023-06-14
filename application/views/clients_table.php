@@ -24,7 +24,8 @@
                         <?php }elseif($row['active']=='0'){ ?>
                             <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalActivation" onclick="viewActivationClient('<?php echo $row['active']; ?>','<?php echo $row['clientid']; ?>')">Activate</button>
                         <?php } ?>
-                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalEntity" onclick="viewEntity('<?php echo $row['clientid']; ?>')">Entity</button>
+                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalGroup" onclick="viewGroup('<?php echo $row['clientid']; ?>')">Group</button>
+                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalEntity" onclick="viewEntity('<?php echo $row['clientid']; ?>','<?php echo $row['typebas']; ?>')">Entity</button>
                     </td>
                 </tr>
         <?php } ?>
