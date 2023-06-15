@@ -1022,6 +1022,12 @@
                         formEl.addEventListener('submit', saveToFolder);
                         var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                         formEl.dispatchEvent(submitEvent);
+                    }else{
+                        $('#modalFilezone').modal('toggle');
+                        swal("Saved!", "Client File successfully saved!", "success");
+                        $("#savefilezone").prop('disabled', false);
+                        document.getElementById('savefilezone').innerHTML = 'Save';
+                        loadFiles();
                     }
                 });
             }else{
@@ -1031,6 +1037,12 @@
                         formEl.addEventListener('submit', saveToFolder);
                         var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                         formEl.dispatchEvent(submitEvent);
+                    }else{
+                        $('#modalFilezone').modal('toggle');
+                        swal("Saved!", "Client File successfully saved!", "success");
+                        $("#savefilezone").prop('disabled', false);
+                        document.getElementById('savefilezone').innerHTML = 'Save';
+                        loadFiles();
                     }
                 });
             }
@@ -1056,6 +1068,12 @@
                         formEr.addEventListener('submit', saveToFolderReview);
                         var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                         formEr.dispatchEvent(submitEvent);
+                    }else{
+                        $('#modalFilereview').modal('toggle');
+                        swal("Saved!", "BTG File successfully saved!", "success");
+                        $("#savefilereview").prop('disabled', false);
+                        document.getElementById('savefilereview').innerHTML = 'Save';
+                        loadFiles();
                     }
                 });
             }else{
@@ -1065,6 +1083,12 @@
                         formEr.addEventListener('submit', saveToFolderReview);
                         var submitEvent = new Event('submit', { bubbles: true, cancelable: true });
                         formEr.dispatchEvent(submitEvent);
+                    }else{
+                        $('#modalFilereview').modal('toggle');
+                        swal("Saved!", "BTG File successfully saved!", "success");
+                        $("#savefilereview").prop('disabled', false);
+                        document.getElementById('savefilereview').innerHTML = 'Save';
+                        loadFiles();
                     }
                 });
             }
@@ -1126,9 +1150,9 @@
             contentType:false,
             cache:false,
             async:true,
-            beforeSend: function() {},
-            success: function(response) {},
-            error: function() {},
+            beforeSend: function() {console.log('beforesend');},
+            success: function(response) {console.log('success');},
+            error: function() {console.log('error');},
             complete: function() {
                 $('#modalFilezone').modal('toggle');
                 swal("Saved!", "Client File successfully saved!", "success");
@@ -1148,9 +1172,9 @@
             contentType:false,
             cache:false,
             async:true,
-            beforeSend: function() {},
-            success: function(response) {},
-            error: function() {},
+            beforeSend: function() {console.log('beforesend');},
+            success: function(response) {console.log('success');},
+            error: function() {console.log('error');},
             complete: function() {
                 $('#modalFilereview').modal('toggle');
                 swal("Saved!", "BTG File successfully saved!", "success");

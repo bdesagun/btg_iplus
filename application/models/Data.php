@@ -331,6 +331,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				o.name as filetypename,
 				'". $_SESSION["username"] ."' as username,
 				e.trailstatus,
 				CASE
@@ -359,6 +360,8 @@ class Data extends CI_Model {
 						AND x.clientid = e.clientid
 						AND x.entity = e.entity
 				)
+			LEFT JOIN dropdown o ON
+			a.filetype = o.value
 			WHERE a.month=? AND a.year=? AND a.clientid = ?
 			AND a.fileentity LIKE '%".$entity."%'
 			AND a.filecategory = 'clientfile'
@@ -372,6 +375,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				o.name as filetypename,
 				c.username,
 				d.clientname,
 				e.trailstatus,
@@ -406,6 +410,8 @@ class Data extends CI_Model {
 			a.fileowner = c.username
 			LEFT JOIN clients d ON
 			c.clientid = d.clientid
+			LEFT JOIN dropdown o ON
+			a.filetype = o.value
 			WHERE a.month=? AND a.year=?
 			AND c.clientid LIKE '".$client."'
 			AND a.fileentity LIKE '%".$entity."%'
@@ -444,7 +450,10 @@ class Data extends CI_Model {
 	}
 	public function select_filetype()
 	{
-		$q = "SELECT * FROM dropdown WHERE category='filezone'";
+		$q = "SELECT *
+		FROM dropdown
+		WHERE category = 'filezone'
+		AND FIND_IN_SET(value, (SELECT filetype FROM clients WHERE clientid = ". $_SESSION["clientid"] .")) > 0;";
 		return $this->db->query($q)->result_array();
 	}
 	public function select_client()
