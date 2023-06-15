@@ -385,7 +385,7 @@
             console.log(params);
             $.post("insert_entity",params).done(function(data) {
                 viewEntity(client_id, type_bas);
-                GetGroup(id,type_bas)
+                GetGroup(client_id, type_bas)
                 $("#entity").val("");
             });
         }
@@ -396,7 +396,7 @@
             entityid    : id,
         };
         $.post("delete_entity",params).done(function(data) {
-            viewEntity(client_id);
+            viewEntity(client_id, type_bas);
         });
     }
     function updateEntity(id){

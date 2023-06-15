@@ -21,7 +21,7 @@
                         <td><?php echo $row['clientname']; ?></td>
                     <?php } ?>
                     <td><?php echo $row['fileentity']; ?></td>
-                    <td><?php echo $row['filetype']; ?></td>
+                    <td><?php echo $row['filetypename']; ?></td>
                     <td><i class="ni ni-tag text-<?php echo $row['filecolor']; ?>"></i><?php echo " ".$row['filestatus']; ?>   </td>
                     <td><?php echo $row['filedate']; ?></td>
                     <td>
