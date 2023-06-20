@@ -15,7 +15,7 @@ class Data extends CI_Model {
 				u.*,
 				c.clientname,
 				(SELECT GROUP_CONCAT(clientid) AS emails FROM userentity WHERE username = ?) AS clientaccess,
-				(SELECT GROUP_CONCAT(CONCAT('''', entity, '''' )) AS emails FROM userentity WHERE username = ?) AS entityaccess,
+				(SELECT GROUP_CONCAT(entity) AS emails FROM userentity WHERE username = ?) AS entityaccess,
 				CASE WHEN u.active = 2 THEN
 					CASE WHEN u.added_date < DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY) THEN 'Expired' ELSE 'Pending' END
 				END AS account_status
@@ -118,17 +118,13 @@ class Data extends CI_Model {
 	}
 	public function select_access_list($username)
 	{
-		$q = "SELECT
-			a.*,
-			b.clientname
-		FROM
-			userentity a
-		LEFT JOIN
-			clients b
-		ON
-			a.clientid = b.clientid
-		WHERE
-			username=?";
+		$q = "SELECT a.*, b.clientname, c.entityname
+		FROM userentity a
+		LEFT JOIN clients b
+		ON a.clientid = b.clientid
+		LEFT JOIN entities c
+		ON c.entityid = a.entity
+		WHERE username=?";
 		$params = array($username);
 		return $this->db->query($q,$params)->result_array();
 	}
@@ -243,6 +239,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				m.entityname,
 				'". $_SESSION["username"] ."' as username,
 				e.trailstatus,
 				e.updateddate
@@ -268,6 +265,8 @@ class Data extends CI_Model {
 						AND x.clientid = e.clientid
 						AND x.entity = e.entity
 				)
+			LEFT JOIN entities m ON
+			a.fileentity = m.entityid
 			WHERE a.month=? AND a.year=? AND a.clientid = ?
 			AND a.fileentity LIKE '%".$entity."%'
 			AND a.filecategory = 'btgfile'
@@ -281,6 +280,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				m.entityname,
 				c.username,
 				d.clientname,
 				e.trailstatus,
@@ -311,6 +311,8 @@ class Data extends CI_Model {
 			a.fileowner = c.username
 			LEFT JOIN clients d ON
 			a.clientid = d.clientid
+			LEFT JOIN entities m ON
+			a.fileentity = m.entityid
 			WHERE a.month=? AND a.year=?
 			AND a.clientid LIKE '".$client."'
 			AND a.fileentity LIKE '%".$entity."%'
@@ -331,6 +333,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				m.entityname,
 				o.name as filetypename,
 				'". $_SESSION["username"] ."' as username,
 				e.trailstatus,
@@ -362,6 +365,8 @@ class Data extends CI_Model {
 				)
 			LEFT JOIN dropdown o ON
 			a.filetype = o.value
+			LEFT JOIN entities m ON
+			a.fileentity = m.entityid
 			WHERE a.month=? AND a.year=? AND a.clientid = ?
 			AND a.fileentity LIKE '%".$entity."%'
 			AND a.filecategory = 'clientfile'
@@ -375,6 +380,7 @@ class Data extends CI_Model {
 			$q = "SELECT
 				a.*,
 				b.*,
+				m.entityname,
 				o.name as filetypename,
 				c.username,
 				d.clientname,
@@ -412,6 +418,8 @@ class Data extends CI_Model {
 			c.clientid = d.clientid
 			LEFT JOIN dropdown o ON
 			a.filetype = o.value
+			LEFT JOIN entities m ON
+			a.fileentity = m.entityid
 			WHERE a.month=? AND a.year=?
 			AND c.clientid LIKE '".$client."'
 			AND a.fileentity LIKE '%".$entity."%'
@@ -487,16 +495,18 @@ class Data extends CI_Model {
 	{
 		$access = "";
 		if($_SESSION["position"] != 'client'){
-			$access = " AND d.subcategory IN (".$_SESSION["clientaccess"].") AND d.value IN (".$_SESSION["entityaccess"].") ";
+			$access = " AND d.clientid IN (".$_SESSION["clientaccess"].") AND d.entityid IN (".$_SESSION["entityaccess"].") ";
 		}
-		$q = "SELECT d.*, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=d.value AND f.clientid=d.subcategory) AS filecount
-		FROM dropdown d WHERE category='client' AND subcategory=?" . $access;
+		$q = "SELECT d.entityname AS name, d.entityid AS value, (SELECT COUNT(*) FROM filezone f WHERE f.fileentity=d.entityid AND f.clientid=d.clientid) AS filecount
+		FROM entities d WHERE d.clientid=? AND d.active=1" . $access;
 		$param = array($id);
 		return $this->db->query($q,$param)->result_array();
 	}
 	public function select_entity_staff($month, $year, $clientid, $trailstatus)
 	{
-		$q = "SELECT a.entity AS name, a.entity AS value FROM fileaudittrail a WHERE month=? AND year=? AND clientid=? AND trailstatus=?
+		$q = "SELECT e.entityname AS name, a.entity AS value FROM fileaudittrail a
+			LEFT JOIN entities e ON a.entity=e.entityid
+			WHERE month=? AND year=? AND a.clientid=? AND a.trailstatus=?
 			AND (SELECT COUNT(*) FROM fileaudittrail b WHERE month=? AND year=? AND clientid=? AND a.entity=b.entity  AND trailstatus='ConfirmedBAS') = 0
 			AND a.clientid IN (".$_SESSION["clientaccess"].") AND a.entity IN (".$_SESSION["entityaccess"].")";
 		$param = array($month, $year, $clientid, $trailstatus, $month, $year, $clientid);
@@ -583,8 +593,9 @@ class Data extends CI_Model {
 		$params = array($clientid, $entity, $username);
 		$this->db->query($q, $params);
 		$q = "INSERT INTO userentity(clientid, entity, username, active)
-			SELECT a.clientid, b.value, ? AS username, '1' AS active FROM clients a LEFT JOIN dropdown b ON a.clientid=b.subcategory
-			WHERE a.clientid LIKE ? AND b.value LIKE ?";
+			SELECT a.clientid, b.entityid, ? AS username, '1' AS active FROM clients a
+			LEFT JOIN entities b ON a.clientid=b.clientid AND b.active=1
+			WHERE a.clientid LIKE ? AND b.entityid LIKE ?";
 		$params = array($username, $clientid, $entity);
 		$this->db->query($q, $params);
 	}
@@ -675,7 +686,7 @@ class Data extends CI_Model {
 	}
 	public function view_filehistory($fileid)
 	{
-		$q = "SELECT * FROM filehistory WHERE filestatus='Viewed' AND fileid=?";
+		$q = "SELECT * FROM filehistory WHERE filestatus='Approved' AND fileid=?";
 		$params = array($fileid);
 		return $this->db->query($q, $params)->result_array();
 	}
