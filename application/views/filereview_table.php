@@ -18,7 +18,7 @@
                     <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
                         <td><?php echo $row['clientname']; ?></td>
                     <?php } ?>
-                    <td><?php echo $row['fileentity']; ?></td>
+                    <td><?php echo $row['entityname']; ?></td>
                     <td><?php echo $row['filedate']; ?></td>
                     <td>
                         <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>

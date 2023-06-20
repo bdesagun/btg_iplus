@@ -431,7 +431,7 @@ class Page extends CI_Controller
 		$res = $this->data->select_entity_all($client);
 		$option .= "<option value='ALL'>ALL</option>";
 		foreach ($res as $v) {
-			$option .= "<option value='" . $v["value"] . "'>" . $v["name"] . "</option>";
+			$option .= "<option value='" . $v["entityid"] . "'>" . $v["entityname"] . "</option>";
 		}
 		echo $option;
 	}
@@ -733,10 +733,10 @@ class Page extends CI_Controller
 	{
 		if ($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin") {
 			$post = $this->security->xss_clean($this->input->post());
-			//$data = $this->data->view_filehistory($post["fileid"]);
-			//if (empty($data)) {
-			$this->data->insert_history("Viewed", $post["fileid"], "");
-			//}
+			$data = $this->data->view_filehistory($post["fileid"]);
+			if (empty($data)) {
+				$this->data->insert_history("Viewed", $post["fileid"], "");
+			}
 		}
 	}
 	function approve_file()
