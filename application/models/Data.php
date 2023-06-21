@@ -237,11 +237,13 @@ class Data extends CI_Model {
 		}
 		if($_SESSION["position"] == "client"){
 			$q = "SELECT
+				ROW_NUMBER() OVER (ORDER BY a.fileEntity, b.filedate) AS row_num,
 				a.*,
 				b.*,
 				m.entityname,
 				'". $_SESSION["username"] ."' as username,
 				e.trailstatus,
+				e.remarks,
 				e.updateddate
 			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
@@ -278,12 +280,14 @@ class Data extends CI_Model {
 				$entity = "";
 			}
 			$q = "SELECT
+				ROW_NUMBER() OVER (ORDER BY a.fileEntity, b.filedate) AS row_num,
 				a.*,
 				b.*,
 				m.entityname,
 				c.username,
 				d.clientname,
 				e.trailstatus,
+				e.remarks,
 				e.updateddate
 			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
@@ -504,11 +508,15 @@ class Data extends CI_Model {
 	}
 	public function select_entity_staff($month, $year, $clientid, $trailstatus)
 	{
-		$q = "SELECT e.entityname AS name, a.entity AS value FROM fileaudittrail a
-			LEFT JOIN entities e ON a.entity=e.entityid
+		$access = "";
+		if($_SESSION["position"] != 'client'){
+			$access = " AND a.clientid IN (".$_SESSION["clientaccess"].") AND a.entity IN (".$_SESSION["entityaccess"].")";
+		}
+		$q = "SELECT DISTINCT e.entityname AS name, a.entity AS value FROM fileaudittrail a
+			LEFT JOIN entities e ON a.entity=e.entityid AND e.active=1
 			WHERE month=? AND year=? AND a.clientid=? AND a.trailstatus=?
 			AND (SELECT COUNT(*) FROM fileaudittrail b WHERE month=? AND year=? AND clientid=? AND a.entity=b.entity  AND trailstatus='ConfirmedBAS') = 0
-			AND a.clientid IN (".$_SESSION["clientaccess"].") AND a.entity IN (".$_SESSION["entityaccess"].")";
+			" . $access;
 		$param = array($month, $year, $clientid, $trailstatus, $month, $year, $clientid);
 		return $this->db->query($q,$param)->result_array();
 	}
@@ -616,6 +624,18 @@ class Data extends CI_Model {
 	}
 	public function insert_fileaudittrail($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 	{
+		if($trailstatus == 'Confirmed'){
+			$remarks = 'Newly uploaded BTG Files.';
+		}elseif($trailstatus == 'Approved'){
+			$remarks = 'Confirmed by the BTG Staff that the BTG Files are completed.';
+		}elseif($trailstatus == 'Reviewed'){
+			$remarks = 'Approved by the Reviewer that the BTG Files  are all correct.';
+		}elseif($trailstatus == 'ConfirmedBAS'){
+			$remarks = 'Approved by the Client that the BTG Files  are all correct.';
+		}elseif($trailstatus == 'ReturnBAS'){
+			$trailstatus = 'Confirmed';
+			$remarks = 'Returned by the '.$_SESSION["position"]. ': <br>'. $remarks;
+		}
 		$q = "INSERT INTO fileaudittrail(clientid, entity, month, year, updatedby, trailstatus, remarks, updateddate) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP())";
 		$params = array($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks);
 		$this->db->query($q, $params);

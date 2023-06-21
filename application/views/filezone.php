@@ -514,6 +514,61 @@
                 </div>
             </div>
         <?php } ?>
+        <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
+            <div class="modal fade" id="modalForReturn" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filezoneLabel">File Return</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">This is to return the BAS files with issues.</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <select class="form-control" id="selectEntityReturn" onchange="loadFilesListReturn('btgfile')"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="table-responsive py-4"  id="div_filereturn_table"></div>
+                                        <div id='val_selectEntityReturn'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Reason:</label>
+                                        <textarea class="form-control" id="returnReason" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="returnButton" onclick="auditReturn('ReturnBAS')">Return</button>
+                                        <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+
         <!-- Header -->
         <div class="header pb-6">
             <div class="container-fluid">
@@ -617,15 +672,19 @@
                                     </div>
                                 <?php } ?>
                                 <?php if($_SESSION["position"] == "reviewer" || $_SESSION["position"] == "admin"){ ?>
-                                    <div class="col-md-2 text-right"></div>
                                     <div class="col-md-2 text-right">
                                         <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReview" onclick="GetEntity4('Approved')">Approve BAS Files</button></h3>
                                     </div>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReturn" onclick="GetEntityReturn('Approved')">Return BAS Files</button></h3>
+                                    </div>
                                 <?php } ?>
                                 <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
-                                    <div class="col-md-2 text-right"></div>
                                     <div class="col-md-2 text-right">
                                         <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalConfirmBAS" onclick="GetEntityBas()">Confirm BAS Files</button></h3>
+                                    </div>
+                                    <div class="col-md-2 text-right">
+                                        <h3 class="mb-0"><button type="button" style="width:100%" class="btn btn-outline-default" data-toggle="modal" data-target="#modalForReturn" onclick="GetEntityReturn('Reviewed')">Return BAS Files</button></h3>
                                     </div>
                                 <?php } ?>
                             </div>
@@ -712,6 +771,18 @@
         };
         $.post("select_filelist", params).done(function(data) {
             $("#div_filebas_table").html(data);
+        });
+    }
+    function loadFilesListReturn(filecateg){
+        $("#div_filereturn_table").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            filemonth       : $("#selectMonth").val(),
+            fileyear        : $("#selectYear").val(),
+            entity          : $("#selectEntityReturn").val(),
+            filecategory    : filecateg,
+        };
+        $.post("select_filelist", params).done(function(data) {
+            $("#div_filereturn_table").html(data);
         });
     }
     function GetMonth(){
@@ -818,6 +889,24 @@
             $("#selectEntityBas").prop('disabled', false);
         });
         $("#div_filebas_table").empty();
+    }
+    function GetEntityReturn(tstatus){
+        $("#returnButton").prop('disabled', true);
+        $("#selectEntityReturn").prop('disabled', true);
+        $('#selectEntityReturn')
+            .empty()
+            .append('<option value="">LOADING...</option>');
+        var params;
+        params = {
+            fileMonth   : $("#selectMonth").val(),
+            fileYear    : $("#selectYear").val(),
+            trailstatus : tstatus,
+        };
+        $.post("select_entity_staff", params , function(data) {
+            $("#selectEntityReturn").html(data);
+            $("#selectEntityReturn").prop('disabled', false);
+        });
+        $("#div_filelist_table").empty();
     }
     function GetEntity4(tstatus){
         $("#confirmButton").prop('disabled', true);
@@ -1110,11 +1199,20 @@
         };
         $.post("insert_fileaudittrail",params).done(function(data) {
             swal("Saved!", "File successfully " + status + "!", "success");
-            // if(status != 'ConfirmedBAS'){
-            //     $('#modalConfirm').modal('toggle');
-            // }else{
-            //     $('#modalConfirmBAS').modal('toggle');
-            // }
+            loadFiles();
+        });
+    }
+    function auditReturn(status){
+        var params;
+        params = {
+            fileMonth   : $("#selectMonth").val(),
+            fileYear    : $("#selectYear").val(),
+            fileEntity  : $("#selectEntityReturn").val(),
+            trailstatus : status,
+            reason      : $("#returnReason").val(),
+        };
+        $.post("insert_fileauditreturn",params).done(function(data) {
+            swal("Saved!", "Files successfully returned!", "success");
             loadFiles();
         });
     }
