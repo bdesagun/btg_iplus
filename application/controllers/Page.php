@@ -619,9 +619,22 @@ class Page extends CI_Controller
 			$post["telephonenumber"]
 		);
 	}
+	function insert_fileauditreturn()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$client = $_SESSION["clientid"];
+		$this->data->insert_fileaudittrail(
+			$client,
+			$post["fileEntity"],
+			$post["fileMonth"],
+			$post["fileYear"],
+			$_SESSION["username"],
+			$post["trailstatus"],
+			$post["reason"]
+		);
+	}
 	function insert_fileaudittrail()
 	{
-		//($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 		$post = $this->security->xss_clean($this->input->post());
 		$client = $_SESSION["clientid"];
 		$this->data->insert_fileaudittrail(

@@ -57,11 +57,14 @@
             <?php if(isset($fileaudit["trailstatus"])){ ?>
                 <?php if($fileaudit["trailstatus"] == 'Reviewed'){ ?>
                     $("#confirmButtonBas").prop('disabled', false);
+                    $("#returnButton").prop('disabled', false);
                 <?php }else{ ?>
                     $("#confirmButtonBas").prop('disabled', true);
+                    $("#returnButton").prop('disabled', true);
                 <?php } ?>
             <?php }else{ ?>
                 $("#confirmButtonBas").prop('disabled', true);
+                $("#returnButton").prop('disabled', true);
             <?php } ?>
         </script>
     <?php } ?>
@@ -139,11 +142,14 @@
         <?php if(isset($fileaudit["trailstatus"])){ ?>
             <?php if($fileaudit["trailstatus"] == 'Approved'){ ?>
                 $("#confirmButton").prop('disabled', false);
+                $("#returnButton").prop('disabled', false);
             <?php }else{ ?>
                 $("#confirmButton").prop('disabled', true);
+                $("#returnButton").prop('disabled', true);
             <?php } ?>
         <?php }else{ ?>
             $("#confirmButton").prop('disabled', true);
+            $("#returnButton").prop('disabled', true);
         <?php } ?>
     </script>
 <?php } ?>
