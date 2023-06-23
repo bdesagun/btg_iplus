@@ -6,6 +6,7 @@
                 <th>Client Name</th>
             <?php } ?>
             <th>Entity</th>
+            <th>Fire Status</th>
             <th>Last Updated</th>
             <th style="width:20%">Action</th>
             <th style="width:20%">Remarks</th>
@@ -22,6 +23,7 @@
                         <td><?php echo $row['clientname']; ?></td>
                     <?php } ?>
                     <td><?php echo $row['entityname']; ?></td>
+                    <td><i class="ni ni-tag text-<?php echo $row['auditcolor']; ?>"></i><?php echo " ".$row['auditstatus']; ?>   </td>
                     <td><?php echo $row['filedate']; ?></td>
                     <td>
                         <?php if($_SESSION["position"] == "staff" || $_SESSION["position"] == "admin"){ ?>
@@ -34,7 +36,7 @@
                                 </button>
                             <?php } ?>
                         <?php } ?>
-                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalHistory" onclick="historyFile(<?php echo $row['fileid']; ?>)">
+                        <button type="button" style="padding:1px 15px" class="btn btn-outline-default btn-sm" data-toggle="modal" data-target="#modalAuditHistory" onclick="historyAuditFile(<?php echo $row['fileentity']; ?>)">
                             History
                         </button>
                     </td>

@@ -237,14 +237,24 @@ class Data extends CI_Model {
 		}
 		if($_SESSION["position"] == "client"){
 			$q = "SELECT
-				ROW_NUMBER() OVER (ORDER BY a.fileEntity, b.filedate) AS row_num,
+				ROW_NUMBER() OVER (PARTITION BY a.fileEntity ORDER BY a.fileEntity, b.filedate) AS row_num,
 				a.*,
 				b.*,
 				m.entityname,
 				'". $_SESSION["username"] ."' as username,
 				e.trailstatus,
 				e.remarks,
-				e.updateddate
+				e.updateddate,
+				CASE
+					WHEN e.trailstatus = 'Confirmed' THEN 'For BAS Filing'
+					WHEN e.trailstatus = 'Approved' THEN 'Confirmed'
+					WHEN e.trailstatus = 'Reviewed' THEN 'Reviewed'
+					WHEN e.trailstatus = 'ConfirmedBAS' THEN 'Completed'
+				END AS auditstatus,
+				CASE
+					WHEN e.trailstatus = 'ConfirmedBAS' THEN 'green'
+					ELSE 'orange'
+				END AS auditcolor
 			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
 			AND b.filedate =
@@ -280,7 +290,7 @@ class Data extends CI_Model {
 				$entity = "";
 			}
 			$q = "SELECT
-				ROW_NUMBER() OVER (ORDER BY a.fileEntity, b.filedate) AS row_num,
+				ROW_NUMBER() OVER (PARTITION BY a.fileEntity ORDER BY a.fileEntity, b.filedate) AS row_num,
 				a.*,
 				b.*,
 				m.entityname,
@@ -288,7 +298,17 @@ class Data extends CI_Model {
 				d.clientname,
 				e.trailstatus,
 				e.remarks,
-				e.updateddate
+				e.updateddate,
+				CASE
+					WHEN e.trailstatus = 'Confirmed' THEN 'For BAS Filing'
+					WHEN e.trailstatus = 'Approved' THEN 'Confirmed'
+					WHEN e.trailstatus = 'Reviewed' THEN 'Reviewed'
+					WHEN e.trailstatus = 'ConfirmedBAS' THEN 'Completed'
+				END AS auditstatus,
+				CASE
+					WHEN e.trailstatus = 'ConfirmedBAS' THEN 'green'
+					ELSE 'orange'
+				END AS auditcolor
 			FROM filezone a
 			LEFT JOIN filehistory b ON a.fileid = b.fileid
 			AND b.filedate =
@@ -442,6 +462,22 @@ class Data extends CI_Model {
 		$params = array($fileid);
 		return $this->db->query($q,$params)->result_array();
 	}
+	public function select_audithistory($entityid)
+	{
+		$q = "SELECT
+				a.*,
+				CASE
+					WHEN a.trailstatus = 'Confirmed' THEN 'For BAS Filing'
+					WHEN a.trailstatus = 'Approved' THEN 'Confirmed'
+					WHEN a.trailstatus = 'Reviewed' THEN 'Reviewed'
+					WHEN a.trailstatus = 'ConfirmedBAS' THEN 'Completed'
+				END AS auditstatus,
+				b.accountname
+			FROM fileaudittrail a
+			LEFT JOIN useraccount b ON a.updatedby = b.username WHERE a.entity=?";
+		$params = array($entityid);
+		return $this->db->query($q,$params)->result_array();
+	}
 	public function get_filezone($fileid)
 	{
 		$q="SELECT * FROM filezone WHERE fileid=?";
@@ -465,7 +501,7 @@ class Data extends CI_Model {
 		$q = "SELECT *
 		FROM dropdown
 		WHERE category = 'filezone'
-		AND FIND_IN_SET(value, (SELECT filetype FROM clients WHERE clientid = ". $_SESSION["clientid"] .")) > 0;";
+		AND FIND_IN_SET(value, (SELECT filetype FROM clients WHERE clientid = '". $_SESSION["clientid"] ."')) > 0;";
 		return $this->db->query($q)->result_array();
 	}
 	public function select_client()
@@ -625,13 +661,13 @@ class Data extends CI_Model {
 	public function insert_fileaudittrail($clientid, $fileentity, $month, $year, $updatedby, $trailstatus, $remarks)
 	{
 		if($trailstatus == 'Confirmed'){
-			$remarks = 'Newly uploaded BTG Files.';
+			$remarks = 'Newly uploaded BTG Files: <br>'. $remarks;
 		}elseif($trailstatus == 'Approved'){
-			$remarks = 'Confirmed by the BTG Staff that the BTG Files are completed.';
+			$remarks = 'Confirmed by the BTG Staff: <br>'. $remarks;
 		}elseif($trailstatus == 'Reviewed'){
-			$remarks = 'Approved by the Reviewer that the BTG Files  are all correct.';
+			$remarks = 'Approved by the Reviewer: <br>'. $remarks;
 		}elseif($trailstatus == 'ConfirmedBAS'){
-			$remarks = 'Approved by the Client that the BTG Files  are all correct.';
+			$remarks = 'Approved by the Client: <br>'. $remarks;
 		}elseif($trailstatus == 'ReturnBAS'){
 			$trailstatus = 'Confirmed';
 			$remarks = 'Returned by the '.$_SESSION["position"]. ': <br>'. $remarks;

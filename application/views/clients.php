@@ -615,7 +615,7 @@
         $('#selectGroup' + id)
             .empty()
             .append('<option value="">LOADING...</option>');
-        $.post("select_group", { clientid : client_id }, function(data) {
+        $.post("select_group", { clientid : client_id, typebas : type_bas }, function(data) {
             //console.log(data);
             $("#selectGroup" + id).html(data);
             $("#selectGroup" + id).prop('disabled', false);
