@@ -317,6 +317,12 @@ class Page extends CI_Controller
 		$data["filehistory"] = $this->data->select_filehistory($post["fileid"]);
 		$this->load->view("filehistory", $data);
 	}
+	function select_audithistory()
+	{
+		$post = $this->security->xss_clean($this->input->post());
+		$data["audithistory"] = $this->data->select_audithistory($post["entityid"]);
+		$this->load->view("audithistory", $data);
+	}
 	function select_month()
 	{
 		$option = "";
@@ -619,20 +625,6 @@ class Page extends CI_Controller
 			$post["telephonenumber"]
 		);
 	}
-	function insert_fileauditreturn()
-	{
-		$post = $this->security->xss_clean($this->input->post());
-		$client = $_SESSION["clientid"];
-		$this->data->insert_fileaudittrail(
-			$client,
-			$post["fileEntity"],
-			$post["fileMonth"],
-			$post["fileYear"],
-			$_SESSION["username"],
-			$post["trailstatus"],
-			$post["reason"]
-		);
-	}
 	function insert_fileaudittrail()
 	{
 		$post = $this->security->xss_clean($this->input->post());
@@ -644,7 +636,7 @@ class Page extends CI_Controller
 			$post["fileYear"],
 			$_SESSION["username"],
 			$post["trailstatus"],
-			$post["trailstatus"]
+			$post["fileRemarks"]
 		);
 		if($post["trailstatus"] == 'Confirmed'){
 			$data = $this->data->select_email_recipient('staff', $client, $post["fileEntity"]);

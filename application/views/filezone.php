@@ -262,6 +262,38 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="modalAuditHistory" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filezoneLabel">File History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <form id="form_upload" enctype="multipart/form-data">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div id="div_audit_file"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-group">
+                                                <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Ok</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php if($_SESSION["position"] == "client" || $_SESSION["position"] == "admin"){ ?>
             <div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog" aria-labelledby="filezoneLabel" aria-hidden="true">
                 <div class="modal-dialog modal-sm" role="document">
@@ -292,6 +324,14 @@
                                     <div class="form-group">
                                         <div class="table-responsive py-4"  id="div_filelist_table"></div>
                                         <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Remarks:</label>
+                                        <textarea class="form-control" id="fileRemarks" rows="4"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -336,6 +376,14 @@
                                     <div class="form-group">
                                         <div class="table-responsive py-4"  id="div_filebas_table"></div>
                                         <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Remarks:</label>
+                                        <textarea class="form-control" id="fileRemarksBas" rows="4"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -388,6 +436,14 @@
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
+                                        <label class="form-control-label">Remarks:</label>
+                                        <textarea class="form-control" id="fileRemarks" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
                                         <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal" id="confirmButton" onclick="auditFile('Reviewed')">Approve</button>
                                         <button class="btn btn-outline-default" style="margin-top: 20px" data-dismiss="modal">Cancel</button>
                                     </div>
@@ -428,6 +484,14 @@
                                     <div class="form-group">
                                         <div class="table-responsive py-4"  id="div_filelist_table"></div>
                                         <div id='val_selectEntity3'></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Remarks:</label>
+                                        <textarea class="form-control" id="fileRemarks" rows="4"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1025,6 +1089,15 @@
             $("#div_history_file").html(data);
         });
     }
+    function historyAuditFile(id){
+        $("#div_audit_file").html("<img src='<?php echo base_url(); ?>assets/img/brand/loading.gif'>");
+        params = {
+            entityid   : id
+        };
+        $.post("select_audithistory", params).done(function(data) {
+            $("#div_audit_file").html(data);
+        });
+    }
     function viewFile(id){
         params = {
             fileid   : id
@@ -1185,10 +1258,13 @@
     }
     function auditFile(status){
         var filentitybas;
+        var fileremarks;
         if(status != 'ConfirmedBAS'){
             filentitybas = $("#selectEntity3").val();
+            fileremarks = $("#fileRemarks").val();
         }else{
             filentitybas = $("#selectEntityBas").val();
+            fileremarks = $("#fileRemarksBas").val();
         }
         var params;
         params = {
@@ -1196,6 +1272,7 @@
             fileYear    : $("#selectYear").val(),
             fileEntity  : filentitybas,
             trailstatus : status,
+            fileRemarks : fileremarks,
         };
         $.post("insert_fileaudittrail",params).done(function(data) {
             swal("Saved!", "File successfully " + status + "!", "success");
@@ -1209,9 +1286,9 @@
             fileYear    : $("#selectYear").val(),
             fileEntity  : $("#selectEntityReturn").val(),
             trailstatus : status,
-            reason      : $("#returnReason").val(),
+            fileRemarks : $("#returnReason").val(),
         };
-        $.post("insert_fileauditreturn",params).done(function(data) {
+        $.post("insert_fileaudittrail",params).done(function(data) {
             swal("Saved!", "Files successfully returned!", "success");
             loadFiles();
         });
