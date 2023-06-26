@@ -1165,7 +1165,7 @@
     });
     function saveFile(){
         $("#savefilezone").prop('disabled', true);
-        document.getElementById('savefilezone').innerHTML = 'Uploading';
+        document.getElementById('savefilezone').innerHTML = "<img width='24' height='24' src='<?php echo base_url(); ?>assets/img/brand/uploading.svg'> Uploading";
         if (testFile() == 0){
             var saveStatus = document.getElementById('filezoneLabel').innerHTML;
             var params;
@@ -1212,7 +1212,7 @@
     }
     function saveFileReview(){
         $("#savefilereview").prop('disabled', true);
-        document.getElementById('savefilereview').innerHTML = 'Uploading';
+        document.getElementById('savefilereview').innerHTML = "<img width='24' height='24' src='<?php echo base_url(); ?>assets/img/brand/uploading.svg'> Uploading";
         if (testFileReview() == 0){
             var saveStatus = document.getElementById('filereviewLabel').innerHTML;
             var params;
