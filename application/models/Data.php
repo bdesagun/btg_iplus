@@ -150,29 +150,27 @@ class Data extends CI_Model {
 	public function select_bas_progress($filemonth, $fileyear)
 	{
 		$q = "SELECT
-			d.clientname,
-			b.value,
-			((COUNT(a.entity) * 17) + 10) AS progress,
-            CASE
-            	WHEN COUNT(a.entity) = 1 THEN
-					CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', data_upload, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.subcategory and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 2 THEN
-					CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.subcategory and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 3 THEN
-					CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_review, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.subcategory and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
-            	WHEN COUNT(a.entity) = 4 THEN
-					CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.subcategory and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
-			END AS 'barcolor'
-		FROM dropdown b
-		LEFT JOIN clients d ON b.subcategory = d.clientid
-		LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.value
-        	-- AND a.month = (SELECT x.month FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
-            -- AND a.year = (SELECT x.year FROM filedue x WHERE x.clientid = b.subcategory ORDER BY x.id DESC LIMIT 1)
-        	AND a.month = ? AND a.year = ?
-        LEFT JOIN filedue c ON c.clientid = b.subcategory AND c.month = a.month AND c.year = a.year
-		WHERE b.category = 'client' AND b.subcategory LIKE ? AND d.clientname != 'null'
-		GROUP BY b.value
-        ORDER BY d.clientname";
+				d.clientname,
+				b.entityname,
+				((COUNT(a.entity) * 17) + 10) AS progress,
+				CASE
+					WHEN COUNT(a.entity) = 1 THEN
+						CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', data_upload, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.clientid and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
+					WHEN COUNT(a.entity) = 2 THEN
+						CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_preparation, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.clientid and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
+					WHEN COUNT(a.entity) = 3 THEN
+						CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_review, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.clientid and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
+					WHEN COUNT(a.entity) = 4 THEN
+						CASE WHEN STR_TO_DATE(CONCAT(MONTHNAME(curdate()), ' ', bas_sign_off, ', ', a.year), '%M %d, %Y') >= (SELECT DATE(updateddate) FROM fileaudittrail WHERE clientid = b.clientid and month = a.month and year = a.year limit 1) THEN 'primary' ELSE 'danger' END
+				END AS 'barcolor'
+			FROM entities b
+			LEFT JOIN clients d ON b.clientid = d.clientid
+			LEFT JOIN fileaudittrail a ON a.clientid = d.clientid AND a.entity = b.entityid
+				AND a.month = ? AND a.year = ?
+			LEFT JOIN filedue c ON c.clientid = b.clientid AND c.month = a.month AND c.year = a.year
+			WHERE b.clientid = ? and d.clientname != 'null' and b.active = 1
+			GROUP BY b.entityid
+			ORDER BY b.entityname";
 		$params = array($filemonth, $fileyear, $_SESSION["clientid"]);
 		return $this->db->query($q,$params)->result_array();
 	}

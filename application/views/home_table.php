@@ -102,14 +102,14 @@
         </tr>
     </thead>
     <tbody>
-        <?php  $temp= ''; foreach ($progress as $row) {; ?>
+        <?php  foreach ($progress as $row) { ?>
             <tr>
-                <td><?php echo $row['value']; ?></td>
+                <td><?php echo $row['entityname']; ?></td>
                 <td colspan="6">
                     <button class="btn btn-<?php echo $row['barcolor']; ?> btn-sm" style="width: <?php echo $row['progress'] ?>%;"></button>
                 </td>
             </tr>
-        <?php $temp = $row['clientname'];} ?>
+        <?php } ?>
     </tbody>
 </table>
 <script>
